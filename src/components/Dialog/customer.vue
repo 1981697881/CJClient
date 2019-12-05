@@ -94,7 +94,7 @@
 </template>
 
 <script>
-import { customerList } from "@/api/wy/customer/clientlist";
+import { customerList } from "@/api/wy/customer/commoditylist";
 export default {
   data() {
     return {
@@ -104,7 +104,7 @@ export default {
       },
       list: {
         pageNum: 1,
-        pageSize: 10,
+        pageSize: 50,
         pages: 0,
         total: 0
       },
@@ -163,7 +163,7 @@ export default {
     fetchData() {
       const data = {
         pageNum: this.list.pageNum || 1,
-        pageSize: this.list.pageSize || 5
+        pageSize: this.list.pageSize || 50
       };
       customerList(data).then(res => {
         this.list = res.data;

@@ -59,6 +59,30 @@ export const StaticRouterMap = [{
       }
     }]
   },
+  {
+    path: '/indent',
+    component: Layout,
+    name: 'Indent',
+    meta: {
+      title: '订单管理',
+      icon: 'nested'
+    },
+    children: [{
+      path: 'sales',
+      component: () => import('@/views/indent/sales/index'),
+      name: 'Sales',
+      meta: {
+        title: '新增订单'
+      },
+    },{
+      path: 'returns',
+      component: () => import('@/views/indent/returns/index'),
+      name: 'Returns',
+      meta: {
+        title: '退货订单'
+      },
+    }]
+  },
   /* {
     path: '/wy',
     component: Layout,
@@ -85,7 +109,7 @@ export const StaticRouterMap = [{
           },
           {
             path: 'clients',
-            component: () => import('@/views/wy/customer/clientlist/index'),
+            component: () => import('@/views/wy/customer/commoditylist/index'),
             name: 'Clients',
             meta: {
               title: '客户管理'

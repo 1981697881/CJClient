@@ -48,7 +48,7 @@ export function saveBuild(form) {
 
 // 批量新增楼盘
 export function saveEstate(form) {
-  
+
   return request({
     headers: {
       'Content-Type': 'application/json'
@@ -88,7 +88,7 @@ export function getUnitByTowerId(towerId, pageNum, pageSize) {
   const data = {
     towerId: towerId,
     pageNum: pageNum || 1,
-    pageSize: pageSize || 5
+    pageSize: pageSize || 50
   }
   return request({
     url: 'rx/base/res/getUnitByTowerId.do',

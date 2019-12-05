@@ -3,6 +3,7 @@
     <el-table
       :data="list.list"
       border
+      stripe
       size="mini"
       :highlight-current-row="true"
       @row-dblclick="dblclick"
@@ -25,6 +26,14 @@
         show-overflow-tooltip
         align="center"
       ></el-table-column>
+      <!--<el-table-column
+        fixed="right"
+        label="操作"
+        width="100">
+        <template slot-scope="scope">
+          <el-button  type="text" size="small"  @click.native="">添加</el-button>
+        </template>
+      </el-table-column>-->
       <slot name="after"></slot>
     </el-table>
 
@@ -33,7 +42,7 @@
         @size-change="handleSize"
         @current-change="handleCurrent"
         :current-page="list.pageNum"
-        :page-sizes="[5, 10, 20, 30]"
+        :page-sizes="[50, 100, 250, 500]"
         :page-size="list.pageSize"
         :page-count="list.pages?list.pages:0"
         layout="total, sizes, prev, pager, next, jumper"
