@@ -1,14 +1,14 @@
 <template>
   <div>
     <el-table
-      :data="list.list"
+      :data="list.records"
       border
       stripe
       size="mini"
       :highlight-current-row="true"
       @row-dblclick="dblclick"
       @row-click="rowClick"
-       @selection-change="handleSelectionChange"
+      @current-change="handleCurrentChange"
       :height="height"
       :show-summary="showSummary"
       :summary-method="getSummaries"
@@ -21,6 +21,7 @@
         v-for="(t,i) in columns"
         :key="i"
         :prop="t.name"
+        v-if="t.default!=undefined?t.default:true"
         :label="t.text"
         :width="t.width?t.width:(selfAdaption?'':'120px')"
         show-overflow-tooltip
@@ -41,9 +42,9 @@
       <el-pagination
         @size-change="handleSize"
         @current-change="handleCurrent"
-        :current-page="list.pageNum"
+        :current-page="list.current"
         :page-sizes="[50, 100, 250, 500]"
-        :page-size="list.pageSize"
+        :page-size="list.size"
         :page-count="list.pages?list.pages:0"
         layout="total, sizes, prev, pager, next, jumper"
         :total="list.total?list.total:0"
@@ -141,7 +142,10 @@ export default {
     //监听当前页码数
     handleCurrent(current) {
       return this.$emit("handle-current", current);
-    }
+    },
+      handleCurrentChange(val) {
+          this.currentRow = val;
+      }
   }
 };
 </script>

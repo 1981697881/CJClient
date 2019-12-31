@@ -68,7 +68,7 @@ export const StaticRouterMap = [{
       icon: 'nested'
     },
     children: [{
-      path: 'sales',
+      path: 'indent',
       component: () => import('@/views/indent/sales/index'),
       name: 'Sales',
       meta: {

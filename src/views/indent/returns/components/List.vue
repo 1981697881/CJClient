@@ -33,6 +33,7 @@
       @handle-size="handleSize"
       @handle-current="handleCurrent"
       @dblclick="dblclick"
+       @row-click="rowClick"
     />
 
   </div>
@@ -40,7 +41,7 @@
 
 <script>
 import { mapGetters } from "vuex";
-import { customerList } from "@/api/wy/customer/commoditylist";
+import { returnsList,delReturnOrder} from "@/api/indent/returns";
 import List from "@/components/List";
 
 export default {
@@ -56,13 +57,13 @@ export default {
       list: {},
       type: null,
       columns: [
-          { text: "fid", name: "fid" },
-          { text: "源单单号", name: "name" },
-          { text: "退货单号", name: "name" },
+          { text: "orderId", name: "orderId" },
+          { text: "reOdId", name: "reOdId" },
+          { text: "退货单号", name: "returnOrderNum" },
           { text: "退货数量", name: "contact" },
-          { text: "申请时间", name: "qq" },
+          { text: "申请时间", name: "createTime" },
           { text: "退货原因", name: "qq" },
-          { text: "状态", name: "qq" },
+          { text: "状态", name: "isAudit" },
       ]
     };
   },
@@ -79,35 +80,43 @@ export default {
   methods: {
     //监听每页显示几条
     handleSize(val) {
-      this.list.pageSize = val
-      this.fetchData(this.node.data.fid,this.node.data.type);
+        this.list.size = val
+        this.fetchData(this.node.data.fid,this.node.data.type);
     },
-    //监听当前页
-    handleCurrent(val) {
-      this.list.pageNum = val;
-      this.fetchData(this.node.data.fid,this.node.data.type);
+      //监听当前页
+      handleCurrent(val) {
+          this.list.current = val;
+          this.fetchData(this.node.data.fid,this.node.data.type);
     },
+      //监听单击某一行
+      rowClick(obj) {
+          this.$store.dispatch("list/setClickData", obj.row);
+      },
     dblclick(obj) {
       const data = {
-        fid : obj.row.fid,
-        type : obj.row.type
+          reOdId : obj.row.reOdId,
       }
       this.$emit('showDialog',data)
     },
-    fetchData(fid, type) {
+    fetchData() {
       this.loading = true;
-
       const data = {
       /*  fid: fid,
         type: type,*/
-        pageNum: this.list.pageNum || 1,
-        pageSize: this.list.pageSize || 50
+        pageNum: this.list.current || 1,
+        pageSize: this.list.size || 50
       };
-        customerList(data).then(res => {
+        returnsList(data).then(res => {
         this.loading = false;
         this.list = res.data;
       });
-    }
+    },
+      delOrder(val){
+          this.loading = true;
+          delReturnOrder(val).then(res => {
+              this.loading = false;
+          });
+      },
   }
 };
 </script>

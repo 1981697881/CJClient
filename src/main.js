@@ -17,8 +17,12 @@ import '@/icons' // icon
 import '@/permission' // permission control
 
 import Cookies from 'js-cookie'
-import {login} from '@/api/user'
+import {login,logout} from '@/api/user'
 
+import {
+  MessageBox,
+  Message
+} from 'element-ui'
 
 /**
  * If you don't want to use mock-server
@@ -51,7 +55,21 @@ new Vue({
       password: Cookies.get('ps')
      }
     if(data.username && data.password){
-     login(data)
+      if(Cookies.get('rx')==undefined||Cookies.get('rx')==""){
+        logout()
+        this.$router.push(`/login`)
+        store.dispatch('user/resetToken')
+      }else{
+        login(data).then(res => {
+          console.log(res)
+        }).catch(res => {
+          Message({
+            message:res.msg,
+            type:'error',
+            duration: 5 * 1000
+          })
+        })
+      }
     }
     /* let routes = JSON.parse(localStorage.getItem('routes'))
     if(routes){
@@ -67,7 +85,7 @@ new Vue({
     })
     router.addRoutes(routes)
     global.antRouter = router.options.routes.concat(routes) // 将路由数据传递给全局变量，做侧边栏菜单渲染工作
-    
+
     console.log(router.options.routes) */
-  } 
+  }
 })

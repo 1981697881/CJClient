@@ -10,7 +10,6 @@
         :width="t.width?t.width:''"
       ></el-table-column>
     </el-table>
-
     <div class="text-center" v-if="list.total && list.total!=0">
       <el-pagination
         @size-change="handleSizeChange"
@@ -24,7 +23,7 @@
       ></el-pagination>
     </div>-->
     <list
-       class="list-main box-shadow"
+      class="list-main box-shadow"
       :columns="columns"
       :loading="loading"
       :list="list"
@@ -41,7 +40,7 @@
 
 <script>
 import { mapGetters } from "vuex";
-import { customerList } from "@/api/wy/customer/commoditylist";
+import { salesList ,delSaleOrder} from "@/api/indent/sales";
 import List from "@/components/List";
 
 export default {
@@ -56,30 +55,29 @@ export default {
       loading: false,
       list: {},
       columns: [
-        { text: "fid", name: "fid" },
-        { text: "订单单号", name: "name" },
-        { text: "数量", name: "contact" },
+        { text: "oid", name: "oid" , default: false},
+        { text: "订单单号", name: "orderId" },
         { text: "金额", name: "phone" },
-        { text: "下单时间", name: "qq" },
-          { text: "状态", name: "qq" },
+        { text: "下单时间", name: "createTime" },
+          { text: "审核状态", name: "auditStatus" },
+          { text: "状态", name: "status" },
       ]
     };
   },
   methods: {
     //监听每页显示几条
     handleSize(val) {
-      this.list.pageSize = val
-      this.fetchData(this.node.data.fid,this.node.data.type);
+      this.list.size = val
+      this.fetchData();
     },
     //监听当前页
     handleCurrent(val) {
-      this.list.pageNum = val;
-      this.fetchData(this.node.data.fid,this.node.data.type);
+      this.list.current = val;
+      this.fetchData();
     },
     dblclick(obj) {
       const data = {
-        fid : obj.row.fid,
-        type : obj.row.type
+          oid : obj.row.oid,
       }
       this.$emit('showDialog',data)
     },
@@ -87,16 +85,26 @@ export default {
       rowClick(obj) {
           this.$store.dispatch("list/setClickData", obj.row);
       },
-    fetchData(fid, type) {
+      delOrder(val){
+          this.loading = true;
+          delSaleOrder(val).then(res => {
+              this.loading = false;
+          });
+      },
+    fetchData(val) {
       this.loading = true;
-
       const data = {
       /*  fid: fid,
         type: type,*/
-        pageNum: this.list.pageNum || 1,
-        pageSize: this.list.pageSize || 50
+        pageNum: this.list.current || 1,
+        pageSize: this.list.size || 50
       };
-        customerList(data).then(res => {
+      const query={
+          query: typeof(val) == "undefined" ? '':val.query,
+          endDate: typeof(val) == "undefined" ? '':val.endDate,
+          startDate: typeof(val) == "undefined" ? '':val.startDate,
+      };
+        salesList(data,query).then(res => {
         this.loading = false;
         this.list = res.data;
       });

@@ -20,13 +20,13 @@
           <el-button :size="'medium'" type="success" icon="el-icon-search">查询</el-button>
         </el-col>
         <el-col :span="2" >
-          <el-button :size="'medium'" type="primary" icon="el-icon-plus" @click.native="handleTab">新增</el-button>
+          <el-button :size="'medium'" type="primary" icon="el-icon-plus" @click.native="handleCreate">新增</el-button>
         </el-col>
         <el-col :span="2" >
-          <el-button :size="'medium'" type="primary" icon="el-icon-edit" @click.native="handleTab">修改</el-button>
+          <el-button :size="'medium'" type="primary" icon="el-icon-edit" @click.native="handleAlter">修改</el-button>
         </el-col>
         <el-col :span="2" >
-          <el-button :size="'medium'" type="warning" icon="el-icon-delete" @click.native="handleTab">删除</el-button>
+          <el-button :size="'medium'" type="warning" icon="el-icon-delete" @click.native="delReturnOrder">删除</el-button>
         </el-col>
       </el-row>
     </el-form>
@@ -38,6 +38,10 @@
 
 import { mapGetters } from "vuex";
 export default {
+    components: {},
+    computed: {
+        ...mapGetters(["node","clickData","selections"])
+    },
   data() {
     return {
       search: {
@@ -74,13 +78,34 @@ export default {
         value4: ''
     };
   },
-  computed: {
-    ...mapGetters(["node"])
-  },
   methods:{
-    handleTab(node){
-        this.$emit('showDialog')
-    }
+      handleCreate(){
+        this.$emit('showDialog',{
+            reOdId :null,
+        })
+    },
+      delReturnOrder(){
+          if (this.clickData.reOdId) {
+              this.$emit('delOrder',this.clickData.reOdId)
+          } else {
+              this.$message({
+                  message: "无选中行",
+                  type: "warning"
+              });
+          }
+      },
+      handleAlter(){
+          if (this.clickData.reOdId) {
+              this.$emit('showDialog',{
+                  reOdId : this.clickData.reOdId,
+              })
+          } else {
+              this.$message({
+                  message: "无选中行",
+                  type: "warning"
+              });
+          }
+      }
   }
 };
 </script>
