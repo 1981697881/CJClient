@@ -1,14 +1,14 @@
 <template>
   <div>
-    <el-form v-model="form" label-width="100px" :size="'mini'">
+    <el-form :model="form" :rules="rules" ref="form" label-width="100px" :size="'mini'">
       <el-row :gutter="20">
         <el-col :span="12">
-          <el-form-item :label="'oid'">
+          <el-form-item :label="'oid'" style="display: none">
             <el-input v-model="oid"></el-input>
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item :label="'平台'">
+          <el-form-item :label="'平台'" style="display: none">
             <el-input v-model="plaId"></el-input>
           </el-form-item>
         </el-col>
@@ -16,35 +16,37 @@
       <el-row :gutter="20">
         <el-col :span="12">
           <el-form-item :label="'订单号'">
-            <el-input v-model="form.orderId"></el-input>
+            <el-input v-model="form.orderId" :disabled="true" ></el-input>
           </el-form-item>
         </el-col>
         <el-col :span="12">
           <el-form-item :label="'下单日期'">
-            <el-input v-model="form.createTime"></el-input>
+            <el-input v-model="form.createTime" :disabled="true" ></el-input>
           </el-form-item>
         </el-col>
       </el-row>
       <el-row :gutter="20">
         <el-col :span="12">
-          <el-form-item :label="'客户名称'">
-            <el-input v-model="form.name"></el-input>
+          <el-form-item :label="'客户名称'" prop="name">
+            <el-input v-model="form.name" :disabled="true" ></el-input>
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item :label="'下单仓库'">
-            <el-input v-model="form.name"></el-input>
+          <el-form-item :label="'仓库'" >
+            <el-select v-model="form.wid" class="width-full" placeholder="请选择仓库" @change="wareChange">
+              <el-option :label="t.name" :value="t.wid" v-for="(t,i) in value1" :key="i"></el-option>
+            </el-select>
           </el-form-item>
         </el-col>
       </el-row>
       <el-row :gutter="20">
         <el-col :span="12">
           <el-form-item :label="'商品'">
-            <el-input v-model="form.name"></el-input>
+            <el-input v-model="form.goods"></el-input>
           </el-form-item>
         </el-col>
         <el-col :span="2">
-          <el-button :size="'mini'" type="success" icon="el-icon-search">查询</el-button>
+          <el-button :size="'mini'" type="success" @click="query" icon="el-icon-search">查询</el-button>
         </el-col>
       </el-row>
       <el-row :gutter="20">
@@ -71,7 +73,7 @@
               width="120">
               <template slot-scope="scope">
                 <el-button type="text" size="small" @click.native="handleAdd(scope.row)">添加</el-button>
-                <el-button type="text" size="small" @click.native="handleBack">查看图片</el-button>
+                <el-button type="text" size="small" @click.native="handleLook(scope.row)">查看图片</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -87,28 +89,6 @@
               :total="list.total?list.total:0"
             ></el-pagination>
           </div>
-          <!-- <el-table :data="list.records"  :height="'250px'" border stripe size="mini" :highlight-current-row="true" >
-             <el-table-column
-               type="selection"
-               width="55">
-             </el-table-column>
-             <el-table-column
-               v-for="(t,i) in columns"
-               :key="i"
-               :prop="t.name"
-               :label="t.text"
-               :width="t.width?t.width:'120px'"
-             ></el-table-column>
-             <el-table-column
-               fixed="right"
-               label="操作"
-               width="120">
-               <template slot-scope="scope">
-                 <el-button  type="text" size="small"  @click.native="handleBack(scope.row)">添加</el-button>
-                 <el-button  type="text" size="small"  @click.native="handleBack">查看图片</el-button>
-               </template>
-             </el-table-column>
-           </el-table>-->
         </el-col>
         <el-col :span="12">
           <el-table :data="tList" :height="'250px'" border stripe size="mini" :highlight-current-row="true">
@@ -158,17 +138,43 @@
         <el-button type="primary" @click.native="saveNum">确定</el-button>
       </div>
     </el-dialog>
+    <el-dialog
+      :visible.sync="tpvisible"
+      title="图片详情"
+      v-if="tpvisible"
+      :width="'40%'"
+      destroy-on-close
+      append-to-body
+    >
+      <div style="text-align: center">
+        <el-upload
+          action="#"
+          list-type="picture-card"
+          accept="png,jpg,jpeg"
+          name="imgS"
+          :class="{hide:hideUpload}"
+          :on-preview="handlePictureCardPreview"
+          :file-list="fileList"
+        >
+          <i class="el-icon-plus"></i>
+        </el-upload>
+        <el-dialog :visible.sync="dialogVisible"   append-to-body >
+          <img width="100%"  :src="dialogImageUrl" alt="">
+        </el-dialog>
+      </div>
+    </el-dialog>
     <div slot="footer" style="text-align:center;padding-top:15px;">
       <el-button type="success" @click="batch">批量添加</el-button>
       <el-button type="warning" @click="exportOrder">导出</el-button>
-      <el-button type="primary" @click.native="saveData">保存</el-button>
+      <el-button type="primary" @click.native="saveData('form')">保存</el-button>
     </div>
   </div>
 </template>
 
 <script>
     import {mapGetters} from "vuex";
-    import {getOrderNum, stockList, saveSale, saleInfo, updateSale,exportorder} from "@/api/indent/sales";
+    import {getOrderNum, stockList, saveSale, saleInfo, updateSale,exportorder,getWarehouse} from "@/api/indent/sales";
+    import {getInfo} from "@/api/user";
     import List from "@/components/List";
 
     export default {
@@ -183,20 +189,46 @@
                 type: Number,
                 default: null
             },
+            plas: {
+                type: Number,
+                default: null
+            },
+            orderId: {
+                type: String,
+                default: null
+            },
+            createTime: {
+                type: String,
+                default: null
+            }
         },
         data() {
             return {
+                fileList:[],
                 num1: 1,
+                hideUpload:true,
+                dialogImageUrl: '',
+                dialogVisible: false,
                 alter: null,
-                plaId: 1,
+                plaId: null,
+                tpvisible:null,
                 visible: null,
                 form: {
+                    goods:null,
+                    warehouse:null,
                     fid: null,
                     orderId: null,
                     createTime: null,
                     name: null, // 客户名称
                     code: null, // 客户编号
                 },
+                rules: {
+                    name: [
+                        {required: true, message: '请输入客户名称', trigger: 'blur'}
+                    ],
+
+                },
+                value1:[],
                 loading: false,
                 list: {},
                 multipleSelection: [],
@@ -214,37 +246,46 @@
                 obj: {},
                 type: null,
                 columns: [
-                    {text: "gid", name: "gid", default: true},
-                    {text: "商品名称", name: "goodCode"},
-                    {text: "编码", name: "goodName"},
-                    {text: "型号", name: "contact"},
-                    {text: "计量单位", name: "phone"},
+                    {text: "gid", name: "gid", default: false},
+                    {text: "商品名称", name: "goodName"},
+                    {text: "编码", name: "goodCode"},
+                    {text: "型号", name: "standard"},
+                    {text: "计量单位", name: "unitOfMea"},
                     {text: "数量", name: "num"},
-                    {text: "单价", name: "phone"},
-                    {text: "备注", name: "qq"},
+                    {text: "仓库", name: "wareHouseName"},
+                    {text: "单价", name: "price"},
                 ], columns2: [
-                    {text: "gid", name: "gid", default: true},
-                    {text: "商品名称", name: "goodCode"},
-                    {text: "编码", name: "goodName"},
-                    {text: "型号", name: "contact"},
-                    {text: "计量单位", name: "phone"},
-                    {text: "单价", name: "phone"},
+                    {text: "gid", name: "gid", default: false},
+                    {text: "商品名称", name: "goodName"},
+                    {text: "编码", name: "goodCode"},
+                    {text: "型号", name: "standard"},
+                    {text: "计量单位", name: "unitOfMea"},
+                    {text: "单价", name: "price"},
+                    {text: "仓库", name: "wareHouseName"},
                     {text: "下单数量", name: "num"},
                     {text: "实发数量", name: "actualNum"},
                 ],
             };
         },
         created() {
-            getOrderNum().then(res => {
-                this.form.orderId = res.data
-            });
-            this.getTime();
+
         },
         mounted() {
+            console.log(this.plas)
             /*this.tableData();*/
+            this.plaId = this.plas;
+            this.wFormat();
+            this.getUserInfo();
             this.fetchData();
             if (typeof (this.oid) != undefined && this.oid != null) {
+                this.form.orderId =  this.orderId
+                this.form.createTime =  this.createTime
                 this.tableData(this.oid);
+            }else{
+                this.getTime();
+                getOrderNum().then(res => {
+                    this.form.orderId = res.data
+                });
             }
         },
         methods: {
@@ -261,6 +302,12 @@
 
                 document.body.appendChild(link)
                 link.click()
+            },
+            wareChange(val) {
+                this.fetchData();
+            },
+            query() {
+               this.fetchData(this.form.goods);
             },
             deleteRow(index, rows) {
                 /*for (let i = 0;i < this.fList.length;i++){
@@ -320,6 +367,10 @@
                 }
 
             },
+            handlePictureCardPreview(file) {
+                this.dialogImageUrl = file.url;
+                this.dialogVisible = true;
+            },
             handleChange(value) {
                 console.log(value);
             },
@@ -368,69 +419,111 @@
                 console.log(this.obj)
             },
             //保存
-            saveData() {
-                let obj = {}, list = this.tList
-                obj.plaId = this.plaId
-                let array = []
-                if (list.length > 0) {
-                    for (const i in list) {
-                        var jbj = {}
-                        jbj.gid = list[i].gid
-                        jbj.num = list[i].num
-                        array.push(jbj)
+            saveData(form) {
+                this.$refs[form].validate((valid) => {
+                    //判断必填项
+                    if (valid) {
+                        let obj = {}, list = this.tList
+                        obj.plaId = this.plaId
+                        let array = []
+                        if (list.length > 0) {
+                            for (const i in list) {
+                                var jbj = {}
+                                jbj.gid = list[i].gid
+                                jbj.num = list[i].num
+                                array.push(jbj)
+                            }
+                            if (typeof (this.oid) != undefined && this.oid != null) {
+                                obj.oid = this.oid
+                                obj.orderGoods = array
+                                updateSale(obj).then(res => {
+                                    this.$emit('hideDialog', false)
+                                    this.$emit('uploadList')
+                                });
+                            } else {
+                                obj.orderGoods = array;
+                                saveSale(obj).then(res => {
+                                    this.$emit('hideDialog', false)
+                                    this.$emit('uploadList')
+                                });
+                            }
+                        } else {
+                            return this.$message({
+                                message: "无数据",
+                                type: "warning"
+                            });
+                        }
                     }
-                    if (typeof (this.oid) != undefined && this.oid != null) {
-                        obj.oid = this.oid
-                        obj.orderGoods = array
-                        updateSale(obj).then(res => {
-                            this.$emit('hideDialog', false)
-                            this.$emit('uploadList')
-                        });
-                    } else {
-                        obj.orderGoods = array;
-                        saveSale(obj).then(res => {
-                            this.$emit('hideDialog', false)
-                            this.$emit('uploadList')
-                        });
-                    }
-                } else {
-                    return this.$message({
-                        message: "无数据",
-                        type: "warning"
-                    });
-                }
-
+                })
             },
             handleAdd(val) {
+                this.num1 = 1;
                 this.obj = JSON.parse(JSON.stringify(val))
                 this.alter = false
                 this.visible = true
             },
-            handleBack(val) {
-                console.log(val)
-                this.visible = true
+            //查看图片
+            handleLook(val) {
+                let imgArray=val.img.split(',');
+                console.log(imgArray.length)
+                if(imgArray.length>0&&val.img != ""){
+                //判断图片是否为空
+                     this.tpvisible = true;
+                    if(this.fileList.length>0){
+                        this.fileList[0].url = 'http://120.78.168.141:8091/web'+imgArray[0];
+                    }else{
+                        this.fileList=[]
+                        this.fileList.push({
+                            url:'http://120.78.168.141:8091/web'+imgArray[0]
+                        })
+                    }
+                }else{
+                    return this.$message({
+                        message: "无图片",
+                        type: "warning"
+                    });
+                }
+
             },
             handleSelectionChange(val) {
                 this.multipleSelection = val
             },
             tableData(oid) {
                 saleInfo(oid).then(res => {
-                    console.log(res)
-                    this.tList = res.data
-                    this.form.createTime = res.data[0].createTime
+                    if(res.flag){
+                        this.tList = res.data
+                    }
                 })
             },
-            fetchData(fid, type) {
+            fetchData(val) {
                 this.loading = true;
                 const data = {
-                    /*  fid: fid,
-                      type: type,*/
+                    goodName: this.form.goods || '',
+                    wid: this.form.wid || '',
+                    plaId: this.plaId,
                     pageNum: this.list.current || 1,
                     pageSize: this.list.size || 50
                 };
                 stockList(data).then(res => {
-                    this.loading = false;
-                    this.list = res.data;
+                    if(res.flag){
+                        this.loading = false;
+                        this.list = res.data;
+                    }
+                })
+            },
+            wFormat(){
+                getWarehouse().then(res => {
+                    if(res.flag) {
+                        this.value1 = res.data;
+                        return;
+                    }
+                })
+            },
+            getUserInfo() {
+                getInfo().then(res => {
+                    if(res.flag) {
+                       this.form.name = res.data["name"];
+                    }
                 })
             }
         }

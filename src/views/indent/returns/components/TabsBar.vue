@@ -2,9 +2,8 @@
   <div class="list-header">
     <el-form v-model="search" :size="'mini'" :label-width="'80px'">
       <el-row :gutter="10">
-        <el-col :span="7" >
-          <div class="block">
-            <span class="demonstration">日期筛选:</span>
+        <el-col :span="7">
+        <el-form-item :label="'日期'">
             <el-date-picker
               v-model="value4"
               type="datetimerange"
@@ -14,20 +13,17 @@
               end-placeholder="结束日期"
               align="right">
             </el-date-picker>
-          </div>
+        </el-form-item>
         </el-col>
         <el-col :span="2">
-          <el-button :size="'medium'" type="success" icon="el-icon-search">查询</el-button>
+          <el-button :size="'mini'" type="success" icon="el-icon-search">查询</el-button>
         </el-col>
-        <el-col :span="2" >
-          <el-button :size="'medium'" type="primary" icon="el-icon-plus" @click.native="handleCreate">新增</el-button>
-        </el-col>
-        <el-col :span="2" >
-          <el-button :size="'medium'" type="primary" icon="el-icon-edit" @click.native="handleAlter">修改</el-button>
-        </el-col>
-        <el-col :span="2" >
-          <el-button :size="'medium'" type="warning" icon="el-icon-delete" @click.native="delReturnOrder">删除</el-button>
-        </el-col>
+          <el-button-group style="float:right">
+
+            <el-button :size="'mini'" type="primary" icon="el-icon-plus" @click.native="handleCreate">新增</el-button>
+            <el-button :size="'mini'" type="primary" icon="el-icon-edit" @click.native="handleAlter">修改</el-button>
+            <el-button :size="'mini'" type="warning" icon="el-icon-delete" @click="delReturnOrder">删除</el-button>
+          </el-button-group>
       </el-row>
     </el-form>
   </div>
@@ -96,9 +92,7 @@ export default {
       },
       handleAlter(){
           if (this.clickData.reOdId) {
-              this.$emit('showDialog',{
-                  reOdId : this.clickData.reOdId,
-              })
+              this.$emit('showDialog',this.clickData)
           } else {
               this.$message({
                   message: "无选中行",

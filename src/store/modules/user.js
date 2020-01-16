@@ -41,7 +41,7 @@ const actions = {
         commit('SET_PASSWORD', password)
         setUserName(username)
         setPassword(password)
-        resolve()
+        resolve(response)
       }).catch(error => {
         reject(error)
       })
@@ -51,12 +51,10 @@ const actions = {
   changePassword({ commit }, info) {
     return new Promise((resolve, reject) => {
       changePassword(info).then(response => {
-        if(response.flag){
           commit('SET_TOKEN', '')
           removeToken()
           resetRouter()
           resolve(response)
-        }
       }).catch(error => {
         reject(error)
       })

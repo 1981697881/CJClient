@@ -1,35 +1,11 @@
 <template>
   <div>
-    <!-- <el-table :data="list.list" border size="mini" :highlight-current-row="true" @row-dblclick="dblclick">
-      <el-table-column prop="date" label="序号" type="index" sortable></el-table-column>
-      <el-table-column
-        v-for="(t,i) in columns"
-        :key="i"
-        :prop="t.name"
-        :label="t.text"
-        :width="t.width?t.width:''"
-      ></el-table-column>
-    </el-table>
-
-    <div class="text-center" v-if="list.total && list.total!=0">
-      <el-pagination
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-        :current-page="pageNum"
-        :page-sizes="[5, 10, 20, 30]"
-        :page-size="pageSize"
-        :page-count="list.pages?list.pages:0"
-        layout="total, sizes, prev, pager, next, jumper"
-        :total="list.total?list.total:0"
-      ></el-pagination>
-    </div>-->
     <list
        class="list-main"
       :columns="columns"
       :loading="loading"
       :list="list"
       index
-      type
       @handle-size="handleSize"
       @handle-current="handleCurrent"
       @dblclick="dblclick"
@@ -57,12 +33,11 @@ export default {
       list: {},
       type: null,
       columns: [
-          { text: "orderId", name: "orderId" },
-          { text: "reOdId", name: "reOdId" },
+          { text: "orderId", name: "orderId", default:false},
+          { text: "reOdId", name: "reOdId",default:false},
           { text: "退货单号", name: "returnOrderNum" },
-          { text: "退货数量", name: "contact" },
           { text: "申请时间", name: "createTime" },
-          { text: "退货原因", name: "qq" },
+          { text: "退货原因", name: "reason" },
           { text: "状态", name: "isAudit" },
       ]
     };
@@ -93,10 +68,8 @@ export default {
           this.$store.dispatch("list/setClickData", obj.row);
       },
     dblclick(obj) {
-      const data = {
-          reOdId : obj.row.reOdId,
-      }
-      this.$emit('showDialog',data)
+
+      this.$emit('showDialog',obj.row)
     },
     fetchData() {
       this.loading = true;
@@ -108,7 +81,9 @@ export default {
       };
         returnsList(data).then(res => {
         this.loading = false;
-        this.list = res.data;
+        if(res.flag&&res.data!=null){
+            this.list = res.data;
+        }
       });
     },
       delOrder(val){

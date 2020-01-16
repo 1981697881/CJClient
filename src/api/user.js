@@ -13,11 +13,16 @@ export function login(data) {
     data
   })
 }
+
+// 获取用户信息
 export function getInfo(fid) {
   return request({
-    url: '/back/system/user/selectUserInfoById.do',
-    method: 'post',
-    params: { fid }
+    url: '/user/getUserInfo',
+    headers: {
+      'authorization': getToken('rx'),
+      'Content-Type': 'application/json'
+    },
+    method: 'put',
   })
 }
 export function logout(data) {

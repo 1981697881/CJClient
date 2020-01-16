@@ -47,19 +47,9 @@ export const StaticRouterMap = [{
   {
     path: '/',
     component: Layout,
-    redirect: '/dashboard',
-    children: [{
-      path: 'dashboard',
-      name: 'Dashboard',
-      component: () => import('@/views/dashboard/index'),
-      meta: {
-        title: '首页',
-        icon: 'dashboard',
-        affix: true ,
-      }
-    }]
+    redirect: '/sales',
   },
-  {
+  /*{
     path: '/indent',
     component: Layout,
     name: 'Indent',
@@ -68,7 +58,7 @@ export const StaticRouterMap = [{
       icon: 'nested'
     },
     children: [{
-      path: 'indent',
+      path: 'sales',
       component: () => import('@/views/indent/sales/index'),
       name: 'Sales',
       meta: {
@@ -82,7 +72,7 @@ export const StaticRouterMap = [{
         title: '退货订单'
       },
     }]
-  },
+  },*/
   /* {
     path: '/wy',
     component: Layout,
@@ -227,8 +217,8 @@ export function resetRouter() {
   const newRouter = createRouter()
   router.matcher = newRouter.matcher // reset router
 }
-
 export default new Router({
+  //mode: 'history', // require service support
   scrollBehavior: () => ({
     y: 0
   }),

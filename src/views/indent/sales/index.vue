@@ -14,7 +14,7 @@
       :width="'70%'"
       destroy-on-close
     >
-      <info :oid="oid"></info>
+      <info @hideDialog="hideWindow" @uploadList="upload" :oid="oid" :plas="plas" :orderId="orderId" :createTime="createTime"></info>
     </el-dialog>
     <el-dialog
       :visible.sync="isSh"
@@ -23,7 +23,7 @@
       :width="'70%'"
       destroy-on-close
     >
-      <returns @hideDialog="hideWindow" @uploadList="upload" :oid="oid" :orderId="orderId"></returns>
+      <returns @hideDialog="hideWindow" @uploadList="upload" :oid="oid"  :orderId="orderId" ></returns>
     </el-dialog>
   </div>
 </template>
@@ -45,6 +45,8 @@
                 visible: null,
                 isSh: null,
                 oid: null,
+                createTime:null,
+                plas:null,
                 orderId:null,
                 treeId: null, // null
                 floorId: null
@@ -55,11 +57,12 @@
         },
         methods: {
             hideWindow(val){
-                console.log(123)
                 this.isSh = val
+                this.visible = val
             },
             handlerDialog(obj) {
-                if (obj) this.oid = obj.oid
+                console.log(obj)
+                if (obj) this.oid = obj.oid;this.plas=obj.plas;this.orderId=obj.orderId;this.createTime=obj.createTime;
                 this.visible = true
                 this.$store.dispatch("list/setClickData", '')
             }, returnRequest(obj) {
@@ -77,6 +80,7 @@
             },
             //更新列表
             upload(){
+                console.log()
                 this.$refs.list.fetchData()
             }
         }

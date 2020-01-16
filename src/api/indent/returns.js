@@ -75,4 +75,15 @@ export function uploadImgs(data) {
     data
   })
 }
+// 根据id查询
+export function getOrderGoodsById(data) {
+  const url = '/returnOrder/getOrderGoodsById/' + data
+  return request({
+    headers: {
+      'authorization': getToken('rx'),
+    },
+    url: url,
+    method: 'get',
+  })
+}
 

@@ -27,8 +27,25 @@ export function getOrderNum() {
 }
 // 获取库存
 export function stockList(data) {
-  //查询分页数据
+  // 查询分页数据
   const url = '/cjsh-stock-info/list/' + data.pageNum + '/' + data.pageSize
+  return request({
+    headers: {
+      'authorization': getToken('rx'),
+      'Content-Type': 'application/json'
+    },
+    url: url,
+    method: 'post',
+    data: {
+      goodName: data.goodName,
+      plaId: data.plaId,
+      wid: data.wid
+    }
+  })
+}
+// 获取仓库下拉
+export function getWarehouse() {
+  const url = '/warehouse/list';
   return request({
     headers: {
       'authorization': getToken('rx'),
@@ -108,6 +125,17 @@ export function exportorder(data) {
     url: url,
     method: 'post',
     data:data
+  })
+}
+// 下拉平台
+export function getPlas(data) {
+  const url = '/Admin/pla/list'
+  return request({
+    headers: {
+      'authorization': getToken('rx')
+    },
+    url: url,
+    method: 'get'
   })
 }
 

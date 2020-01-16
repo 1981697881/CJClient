@@ -3,12 +3,12 @@
     <el-form :model="form" :rules="rules" ref="form" label-width="100px" :size="'mini'">
       <el-row :gutter="20">
         <el-col :span="12">
-          <el-form-item :label="'reOdId'">
+          <el-form-item :label="'reOdId'" style="display: none">
             <el-input v-model="form.reOdId"></el-input>
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item :label="'oid'">
+          <el-form-item :label="'oid'" style="display: none">
             <el-input v-model="form.oid"></el-input>
           </el-form-item>
         </el-col>
@@ -16,7 +16,7 @@
       <el-row :gutter="20">
         <el-col :span="12">
           <el-form-item :label="'源订单号'">
-            <el-input v-model="form.orderId" :disabled="disabled"></el-input>
+            <el-input v-model="form.orderId" ></el-input>
           </el-form-item>
         </el-col>
 
@@ -35,17 +35,15 @@
       <el-row :gutter="20">
         <el-col :span="24" style="text-align: center">
           <el-upload
-            action="#"
+            action="web/file/returnOrder/imgUpload"
             list-type="picture-card"
             accept="png,jpg,jpeg"
             :headers="headers"
             :data="imgData"
             :limit="5"
-            :http-request="uploadFile"
             name="imgS"
             :on-success="uploadSuccess"
             :on-error="uploadError"
-            :auto-upload="false"
             :class="{hide:hideUpload}"
             :on-preview="handlePictureCardPreview"
             :on-change="handleChange"
@@ -54,7 +52,7 @@
             :on-remove="handleRemove">
             <i class="el-icon-plus"></i>
           </el-upload>
-          <el-dialog :visible.sync="dialogVisible" size="tiny">
+          <el-dialog :visible.sync="dialogVisible" append-to-body size="tiny">
             <img width="100%" :src="dialogImageUrl" alt="">
           </el-dialog>
         </el-col>
@@ -141,7 +139,7 @@
         getToken
     } from '@/utils/auth'
     import {getSaleOrder} from "@/api/indent/sales";
-    import {saveReturn, getReturnOrder, alterReturn,uploadImgs} from "@/api/indent/returns";
+    import {saveReturn, getReturnOrder, alterReturn,uploadImgs,getOrderGoodsById} from "@/api/indent/returns";
     import List from "@/components/List";
 
     export default {
@@ -157,6 +155,10 @@
                 type: Number,
                 default: null
             },
+            img: {
+                type: String,
+                default: null
+            },
             orderId: {
                 type: String,
                 default: null
@@ -170,6 +172,7 @@
                 imgData:{
                     ro_id :null
                 },
+                images:[],
                 hideUpload: false,
                 dialogImageUrl: '',
                 dialogVisible: false,
@@ -197,19 +200,21 @@
                 list: [],
                 tList: [],
                 type: null,
+                nowImg:[],
                 columns1: [
-                    {text: "gid", name: "gid"},
-                    {text: "商品名称", name: "goodCode"},
-                    {text: "编码", name: "goodName"},
-                    {text: "型号", name: "contact"},
-                    {text: "计量单位", name: "phone"},
+                    {text: "商品名称", name: "goodName"},
+                    {text: "编码", name: "goodCode"},
+                    {text: "型号", name: "standard"},
+                    {text: "计量单位", name: "unitOfMea"},
+                    {text: "单价", name: "price"},
+                    {text: "仓库", name: "wareHouseName"},
                     {text: "数量", name: "num"},
                     {text: "单价", name: "phone"},
                 ],
                 columns2: [
-                    {text: "shopId", name: "shopId"},
-                    {text: "商品名称", name: "name"},
-                    {text: "数量", name: "number"},
+                    {text: "gid", name: "gid",default:false},
+                    {text: "商品名称", name: "goodName"},
+                    {text: "数量", name: "num"},
                 ],
             };
         },
@@ -217,7 +222,34 @@
 
         },
         mounted() {
+            this.fileList=[]
+            if(this.img != ''&& this.img!=null){
+                let imgArray=this.img.split(',');
+                //判断当前行是否有img
+                if(imgArray.length>0){
+                    //到图片数量大于5或等于5时添加按钮隐藏
+                    if(imgArray.length>=5){
+                        this.hideUpload = true;
+                    }else{
+                        this.hideUpload = false;
+                    }
+                    this.fileList=[]
+                    //从table获取img展示到窗口
+                    for(let i in imgArray){
+                        //添加已有图片到数组
+                        this.images.push(imgArray[i].split('/web/returnOrder/img/')[1])
+                        //展示已有图片到窗口
+                        this.fileList.push({
+                            url:'http://120.78.168.141:8090/web'+imgArray[i],
+                            name:imgArray[i].split('/web/returnOrder/img/')[1]
+                        })
+                    }
+                }else{
+                    this.fileList = [];
+                }
+            }
             this.form.reOdId = this.reOdId
+            this.imgData.ro_id=this.form.reOdId
             this.form.oid = this.oid
             this.form.orderId = this.orderId
             //this.tableData();
@@ -227,6 +259,7 @@
             }
             //退货修改
             if (typeof (this.reOdId) != undefined && this.reOdId != null) {
+
                 this.fetchData(this.form.reOdId);
             }
         },
@@ -246,7 +279,14 @@
                     }
                 }
                 axios.post("/file/returnOrder/imgUpload", this.formDate,config).then( res => {
-                    console.log(res)
+                    if(res.data.flag){
+                        this.$message({
+                            message: res.msg,
+                            type: "success"
+                        });
+                        this.$emit('hideDialog', false)
+                        this.$emit('uploadList')
+                    }
                 }).catch( res => {
                     console.log(res)
                 })
@@ -255,19 +295,19 @@
             //添加数量->待确认区
             saveNum() {
                 if (this.num1 > 0) {
-                    this.$set(this.obj, 'number', this.num1);
-                    this.$set(this.obj, 'shopId', this.obj.gid);
+                    this.$set(this.obj, 'num', this.num1);
+                    this.$set(this.obj, 'gid', this.obj.gid);
                     var tList = this.tList,
                         number = 0,
                         obj = this.obj;
                     //判断添加到待确认的数据是否重复
                     for (var i in tList) {
                         //判断id是否== 是数量加 否添加添加一行
-                        if (obj['gid'] == tList[i]['shopId']) {
-                            console.log(parseFloat(tList[i].number) + parseFloat(obj['number']))
+                        if (obj['gid'] == tList[i]['gid']) {
+                            console.log(parseFloat(tList[i].num) + parseFloat(obj['num']))
                             this.$set(tList, i, {
                                 ...tList[i],
-                                number: parseFloat(tList[i].number) + parseFloat(obj['number'])
+                                num: parseFloat(tList[i].num) + parseFloat(obj['num'])
                             });
                             number++;
                             break;
@@ -289,6 +329,7 @@
                 }
 
             },
+            //上传失败事件
             uploadError(res){
                 this.$message({
                     message: res.msg,
@@ -296,16 +337,32 @@
                 });
                 this.$emit('uploadList')
             },
-            uploadSuccess(res){
-                console.log(123)
+            //上传成功事件
+            uploadSuccess(res,file,fileList){
+                file.name=res.data;
+                this.images.push(res.data)
                 this.$message({
                     message: res.msg,
                     type: "success"
                 });
                 this.$emit('uploadList')
             },
+            //删除图片
             handleRemove(file, fileList) {
-                this.loading = true;
+                console.log(file)
+                console.log(this.images)
+                let array = this.images;
+                for(let i in array){
+                    if(file.name==array[i]){
+                        array.splice(i, 1);
+                    }
+
+                }
+
+               console.log(array)
+
+                //this.fileList=[]
+                /*this.loading = true;
                 alterCommodity({
                     gid:this.imgData.gid,
                     img:''
@@ -320,7 +377,7 @@
                         this.loading = false;
                         this.visible=false;
                     }
-                });
+                });*/
             },
             handlePictureCardPreview(file) {
                 this.dialogImageUrl = file.url;
@@ -346,8 +403,8 @@
                 } else {
                     //控制数量输入最大限度
                     for (var i in list) {
-                        if (list[i]['shopId'] == this.obj['gid']) {
-                            this.max = parseInt(this.obj['num']) - parseInt(list[i]['number'])
+                        if (list[i]['gid'] == this.obj['gid']) {
+                            this.max = parseInt(this.obj['num']) - parseInt(list[i]['num'])
                         }
                     }
                 }
@@ -363,8 +420,8 @@
                         if (list.length > 0) {
                             for (const i in list) {
                                 var jbj = {}
-                                jbj.shopId = list[i].shopId
-                                jbj.number = list[i].number
+                                jbj.gid = list[i].gid
+                                jbj.number = list[i].num
                                 array.push(jbj)
                             }
                             //判断修改或新增
@@ -372,24 +429,29 @@
                                 obj.order = {
                                     orderId: this.form.oid,
                                     reason: this.form.reason,
-                                    reOdId: this.form.reOdId
+                                    reOdId: this.form.reOdId,
+                                    img: this.images.join(',')
                                 }
                                 obj.returnOrders = array
                                 alterReturn(obj).then(res => {
-                                    this.$emit('hideDialog', false)
-                                    this.$emit('uploadList')
+                                    if(res.flag){
+                                        this.$emit('uploadList')
+                                        //批量上傳
+                                        //this.submitUpload()
+                                    }
                                 });
                             } else {
                                 obj.order = {
                                     orderId: this.form.oid,
-                                    reason: this.form.reason
+                                    reason: this.form.reason,
+                                    img: this.images.join(',')
                                 }
                                 obj.returnOrders = array
                                 saveReturn(obj).then(res => {
                                     if(res.flag){
-                                        this.submitUpload(res.data['reOdId'])
-                                        this.$emit('hideDialog', false)
                                         this.$emit('uploadList')
+                                        //批量上傳
+                                        //this.submitUpload(res.data['reOdId'])
                                     }
                                 })
                             }
@@ -413,14 +475,22 @@
                     this.list = res.data
                 })
             },
+            rightTable(val) {
+                getOrderGoodsById(val).then(res => {
+                    this.tList = res.data
+                })
+            },
             fetchData(val) {
                 getReturnOrder(val).then(res => {
-                    console.log(res)
-                    this.disabled = true;
-                    this.tableData(res.data['sourceOrderNum']);
-                    this.form.orderId = res.data['sourceOrderNum'];
-                    this.form.oid = res.data.order['orderId'];
-                    this.tList = res.data['returnOrders']
+                    if(res.flag){
+                        this.disabled = true;
+                        this.tableData(res.data['sourceOrderNum']);
+                        this.form.orderId = res.data['sourceOrderNum'];
+                        this.form.reason = res.data.order['reason'];
+                        this.form.oid = res.data.order['orderId'];
+                        this.rightTable(val)
+                        /* this.tList = res.data['returnOrders']*/
+                    }
                 })
             },
         }

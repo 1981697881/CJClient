@@ -3,19 +3,19 @@
     <!--<Tree class="list-tree" @handler-node="handlerNode" />-->
     <div class="list-containerOther">
       <div>
-        <tabs-bar @addUnit="handlerTabs" @showDialog="handlerDialog" @delOrder="delRequest"/>
+        <tabs-bar  @showDialog="handlerDialog" @delOrder="delRequest"/>
       </div>
-      <list ref="list" @showDialog="handlerDialog"/>
+      <list ref="list" @showDialog="handlerDialog" @uploadList="upload"/>
     </div>
 
     <el-dialog
       :visible.sync="visible"
       title="退货信息"
       v-if="visible"
-      :width="'60%'"
+      :width="'70%'"
       destroy-on-close
     >
-      <returns @hideDialog="hideWindow" @uploadList="upload" :reOdId="reOdId"></returns>
+      <returns @hideDialog="hideWindow" @uploadList="upload" :reOdId="reOdId" :img="img"></returns>
 
     </el-dialog>
   </div>
@@ -35,6 +35,7 @@
                 visible: null,
                 fid: null,
                 reOdId: null,
+                img:null,
                 orderId: null,
                 treeId: null, // null
                 floorId: null
@@ -48,15 +49,12 @@
                 this.visible = val
             },
             handlerDialog(obj) {
-                if (obj) this.reOdId = obj.reOdId
+                if (obj) this.reOdId = obj.reOdId; this.img = obj.img
                 this.visible = true
             },
             handlerNode(node) {
                 console.log(node.data)
                 this.$refs.list.fetchData(node.data.fid, node.data.type)
-            },
-            handlerTabs(prId) {
-                this.$refs.list.addUnit(prId);
             },
             delRequest(val){
                 this.$refs.list.delOrder(val);
