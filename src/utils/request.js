@@ -104,6 +104,7 @@ service.interceptors.response.use(
           })
         }
       }
+
       store.dispatch('user/addToken',response.headers.authorization).then(() => {
 
       })

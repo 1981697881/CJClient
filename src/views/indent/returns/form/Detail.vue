@@ -435,6 +435,7 @@
                                 obj.returnOrders = array
                                 alterReturn(obj).then(res => {
                                     if(res.flag){
+                                      this.$emit('hideDialog', false)
                                         this.$emit('uploadList')
                                         //批量上傳
                                         //this.submitUpload()
@@ -450,6 +451,7 @@
                                 saveReturn(obj).then(res => {
                                     if(res.flag){
                                         this.$emit('uploadList')
+                                      this.$emit('hideDialog', false)
                                         //批量上傳
                                         //this.submitUpload(res.data['reOdId'])
                                     }
