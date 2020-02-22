@@ -71,7 +71,7 @@ export default {
 
       this.$emit('showDialog',obj.row)
     },
-    fetchData() {
+    fetchData(val) {
       this.loading = true;
       const data = {
       /*  fid: fid,
@@ -79,7 +79,12 @@ export default {
         pageNum: this.list.current || 1,
         pageSize: this.list.size || 50
       };
-        returnsList(data).then(res => {
+      const query = {
+        query: typeof (val) == "undefined" ? '' : val.query,
+        endDate: typeof (val) == "undefined" ? '' : val.endDate,
+        startDate: typeof (val) == "undefined" ? '' : val.startDate,
+      };
+        returnsList(data, query).then(res => {
         this.loading = false;
         if(res.flag&&res.data!=null){
             this.list = res.data;

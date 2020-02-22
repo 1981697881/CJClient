@@ -3,7 +3,7 @@ import {
   getToken
 } from '@/utils/auth' // get token from cookie
 // 查询订单列表
-export function returnsList(data) {
+export function returnsList(data, query) {
   const url = '/returnOrder/list/' + data.pageNum + '/' + data.pageSize
   return request({
     headers: {
@@ -11,6 +11,8 @@ export function returnsList(data) {
     },
     url: url,
     method: 'get',
+    params: query
+
   })
 }
 

@@ -49,9 +49,9 @@
           <el-button :size="'mini'" type="primary" icon="el-icon-plus" @click.native="handleCreate">新增</el-button>
           <el-button :size="'mini'" type="primary" icon="el-icon-edit" @click.native="handleAlter">修改</el-button>
           <el-button :size="'mini'" type="warning" icon="el-icon-delete" @click.native="delSaleOrder">删除</el-button>
+          <el-button :size="'mini'" type="primary" icon="el-icon-refresh" @click.native="upload">刷新</el-button>
           <el-button :size="'mini'" type="primary" icon="el-icon-edit" @click.native="returnRequest">退货申请</el-button>
         </el-button-group>
-
       </el-row>
     </el-form>
     <el-dialog
@@ -60,7 +60,6 @@
       v-if="visible"
       :width="'30%'"
       destroy-on-close
-
     >
       <div style="text-align: center" >
         <el-radio v-model="plas"  border size="medium" v-for="t in plaArray"
@@ -201,6 +200,11 @@
 
 
             },
+          upload() {
+            this.$emit('uploadList')
+            this.search.keyword = ''
+            this.value = ''
+          },
             query() {
                 this.$emit('queryOrder', {
                     query: this.search.keyword || '',

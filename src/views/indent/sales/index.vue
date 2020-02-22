@@ -79,8 +79,8 @@
                 this.$refs.list.fetchData(val)
             },
             //更新列表
-            upload(){
-                console.log()
+            upload() {
+
                 this.$refs.list.fetchData()
             }
         }
