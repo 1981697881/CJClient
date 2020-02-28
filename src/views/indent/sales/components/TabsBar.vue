@@ -18,13 +18,13 @@
         </el-col>
         <el-col :span="3">
           <el-form-item :label="'单号'">
-            <el-input v-model="search.keyword" placeholder="输入单号查询"/>
+            <el-input v-model="search.keyword" placeholder="输入关键字查询"/>
           </el-form-item>
         </el-col>
         <el-col :span="2">
           <el-button :size="'mini'" type="success" icon="el-icon-search" @click="query">查询</el-button>
         </el-col>
-        <el-col :span="2">
+        <el-col :span="1">
           <el-upload
             name="order"
             :on-success="uploadSuccess"
@@ -50,6 +50,7 @@
           <el-button :size="'mini'" type="primary" icon="el-icon-edit" @click.native="handleAlter">修改</el-button>
           <el-button :size="'mini'" type="warning" icon="el-icon-delete" @click.native="delSaleOrder">删除</el-button>
           <el-button :size="'mini'" type="primary" icon="el-icon-refresh" @click.native="upload">刷新</el-button>
+          <el-button :size="'mini'" type="primary" icon="el-icon-download" @click="exportOrder">导出</el-button>
           <el-button :size="'mini'" type="primary" icon="el-icon-edit" @click.native="returnRequest">退货申请</el-button>
         </el-button-group>
       </el-row>
@@ -74,9 +75,8 @@
 </template>
 
 <script>
-
-    import {mapGetters} from "vuex";
-    import {getPlas} from "@/api/indent/sales";
+    import { mapGetters } from "vuex"
+    import {getPlas, exportData} from "@/api/indent/sales"
     import {
         getToken
     } from '@/utils/auth'
@@ -102,7 +102,6 @@
                 search: {
                     keyword: null,
                 },
-
                 pickerOptions: {
                     shortcuts: [{
                         text: '最近一周',
@@ -206,18 +205,40 @@
             this.value = ''
           },
             query() {
-                this.$emit('queryOrder', {
-                    query: this.search.keyword || '',
-                    endDate: this.value[1] || '',
-                    startDate: this.value[0] || '',
-                })
+                this.$emit('queryOrder', this.qFilter())
             },
+          // 查询条件过滤
+          qFilter() {
+            let obj = {}
+            this.search.keyword != null || this.search.keyword != undefined ? obj.query = this.search.keyword : null
+            this.value[1] != null || this.value[1] != undefined ? obj.endDate = this.value[1] : null
+            this.value[0] != null || this.value[0] != undefined ? obj.startDate = this.value[0] : null
+            return obj
+          },
+          // 下载文件
+          download(res) {
+            if (!res.data) {
+              return
+            }
+            let url = window.URL.createObjectURL(new Blob([res.data]))
+            let link = document.createElement('a')
+            link.style.display = 'none'
+            link.href = url
+            link.setAttribute('download', res.headers['content-disposition'].split('filename=')[1])
+            document.body.appendChild(link)
+            link.click()
+          },
+          exportOrder() {
+            exportData(this.qFilter()).then(res => {
+              this.download(res)
+            })
+          },
             returnRequest() {
                 if (this.clickData.oid) {
                     console.log(this.clickData)
                     this.$emit('showReturn', {
                         oid: this.clickData.oid,
-                        orderId: this.clickData.orderId,
+                        orderId: this.clickData.orderNum,
                     })
                 } else {
                     this.$message({
@@ -238,12 +259,19 @@
             },
             handleAlter() {
                 if (this.clickData.oid) {
+                  if(this.clickData.auditStatus == '已审核') {
+                    return this.$message({
+                      message: "该订单已审核",
+                      type: "warning"
+                    });
+                  } else {
                     this.$emit('showDialog', {
-                        oid: this.clickData.oid,
-                        plas: this.clickData.plaId,
-                        orderId:this.clickData.orderId,
-                        createTime:this.clickData.createTime
+                      oid: this.clickData.oid,
+                      plas: this.clickData.plas,
+                      orderId: this.clickData.orderNum,
+                      createTime: this.clickData.addTime
                     })
+                  }
                 } else {
                     this.$message({
                         message: "无选中行",

@@ -4,7 +4,7 @@ import {
 } from '@/utils/auth' // get token from cookie
 // 查询订单列表
 export function returnsList(data, query) {
-  const url = '/returnOrder/list/' + data.pageNum + '/' + data.pageSize
+  const url = '/returnOrder/list/' + data.pageNum + '/' + data.pageSize+ '/'
   return request({
     headers: {
       'authorization': getToken('rx'),
@@ -13,6 +13,19 @@ export function returnsList(data, query) {
     method: 'get',
     params: query
 
+  })
+}
+// 查询订单列表
+export function returnsListT(data, query) {
+  const url = '/returnOrder/list/' + data.pageNum + '/' + data.pageSize
+  return request({
+    headers: {
+      'authorization': getToken('rx'),
+      'Content-Type': 'application/json'
+    },
+    url: url,
+    method: 'post',
+    data: query
   })
 }
 
@@ -88,4 +101,17 @@ export function getOrderGoodsById(data) {
     method: 'get',
   })
 }
-
+// 导出单据明细
+export function exportData(data) {
+  const url = '/Admin/export/returnOrderData'
+  return request({
+    headers: {
+      'authorization': getToken('rx'),
+      'Content-Type': 'application/json'
+    },
+    responseType: 'blob',
+    url: url,
+    method: 'post',
+    data: data
+  })
+}

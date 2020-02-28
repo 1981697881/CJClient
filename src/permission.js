@@ -21,22 +21,19 @@ const whiteList = ['/login'] // no redirect whitelist
 
 var hasMenu = false//是否有路由 *
 router.beforeEach(async (to, from, next) => {
-
-
   // start progress bar 加载进度条
   NProgress.start()
   // set page title
   document.title = getPageTitle(to.meta.title)
-
   // determine whether the user has logged in
   const hasToken = getToken('rx')
   if (typeof(hasToken)!='undefined') {
     if (to.path === '/login') {
       // if is logged in, redirect to the home page
-      /* next({
+       next({
          path: '/'
        })
-       NProgress.done()*/
+       NProgress.done()
     } else {
       if (hasMenu) {
         // 获取了动态路由 hasMenu一定true,就无需再次请求 直接放行

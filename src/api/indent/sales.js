@@ -3,7 +3,7 @@ import {
   getToken
 } from '@/utils/auth' // get token from cookie
 // 查询订单列表
-export function salesList(data,query) {
+export function salesList(data, query) {
   const url = '/order/list/' + data.pageNum + '/' + data.pageSize + '/'
   return request({
     headers: {
@@ -11,7 +11,20 @@ export function salesList(data,query) {
     },
     url: url,
     method: 'get',
-    params:query
+    params: query
+  })
+}
+// 查询订单列表2
+export function salesListT(data, query) {
+  const url = '/order/list/' + data.pageNum + '/' + data.pageSize
+  return request({
+    headers: {
+      'authorization': getToken('rx'),
+      'Content-Type': 'application/json'
+    },
+    url: url,
+    method: 'post',
+    data: query
   })
 }
 // 获取订单单号
@@ -26,7 +39,7 @@ export function getOrderNum() {
   })
 }
 // 获取库存
-export function stockList(data) {
+export function stockList(data, query) {
   // 查询分页数据
   const url = '/cjsh-stock-info/list/' + data.pageNum + '/' + data.pageSize
   return request({
@@ -36,11 +49,7 @@ export function stockList(data) {
     },
     url: url,
     method: 'post',
-    data: {
-      goodName: data.goodName,
-      plaId: data.plaId,
-      wid: data.wid
-    }
+    data: query
   })
 }
 // 获取仓库下拉
@@ -124,7 +133,7 @@ export function exportorder(data) {
     responseType: 'blob',
     url: url,
     method: 'post',
-    data:data
+    data: data
   })
 }
 // 下拉平台
@@ -136,6 +145,20 @@ export function getPlas(data) {
     },
     url: url,
     method: 'get'
+  })
+}
+// 导出订单明细
+export function exportData(data) {
+  const url = '/Admin/export/orderData'
+  return request({
+    headers: {
+      'authorization': getToken('rx'),
+      'Content-Type': 'application/json'
+    },
+    responseType: 'blob',
+    url: url,
+    method: 'post',
+    data: data
   })
 }
 

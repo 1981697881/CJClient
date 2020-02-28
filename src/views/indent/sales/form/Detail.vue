@@ -16,43 +16,42 @@
       <el-row :gutter="20">
         <el-col :span="12">
           <el-form-item :label="'订单号'">
-            <el-input v-model="form.orderId" :disabled="true" ></el-input>
+            <el-input v-model="form.orderId" :disabled="true"></el-input>
           </el-form-item>
         </el-col>
         <el-col :span="12">
           <el-form-item :label="'下单日期'">
-            <el-input v-model="form.createTime" :disabled="true" ></el-input>
+            <el-input v-model="form.createTime" :disabled="true"></el-input>
           </el-form-item>
         </el-col>
       </el-row>
       <el-row :gutter="20">
         <el-col :span="12">
           <el-form-item :label="'客户名称'" prop="name">
-            <el-input v-model="form.name" :disabled="true" ></el-input>
+            <el-input v-model="form.name" :disabled="true"></el-input>
           </el-form-item>
         </el-col>
-        <el-col :span="12">
-          <el-form-item :label="'仓库'" >
+        <!--<el-col :span="12">
+          <el-form-item :label="'仓库'">
             <el-select v-model="form.wid" class="width-full" placeholder="请选择仓库" @change="wareChange">
               <el-option :label="t.name" :value="t.wid" v-for="(t,i) in value1" :key="i"></el-option>
             </el-select>
           </el-form-item>
-        </el-col>
+        </el-col>-->
       </el-row>
       <el-row :gutter="20">
         <el-col :span="12">
           <el-form-item :label="'商品'">
-            <el-input v-model="form.goods"></el-input>
+            <el-input v-model="search" @input.native="inat"></el-input>
           </el-form-item>
         </el-col>
         <el-col :span="2">
-          <el-button :size="'mini'" type="success" @click="query" icon="el-icon-search">查询</el-button>
+          <el-button  :size="'mini'" type="success" @click="query" icon="el-icon-search">查询</el-button>
         </el-col>
       </el-row>
       <el-row :gutter="20">
         <el-col :span="12">
-          <el-table class="list-main" :height="'250px'" :data="list.records" border size="mini"
-                    :highlight-current-row="true" @selection-change="handleSelectionChange">
+          <el-table class="list-main" :height="'250px'" :data="list"  border size="mini"  :highlight-current-row="true" @selection-change="handleSelectionChange">
             <el-table-column
               type="selection"
               width="55">
@@ -158,12 +157,14 @@
         >
           <i class="el-icon-plus"></i>
         </el-upload>
-        <el-dialog :visible.sync="dialogVisible"   append-to-body >
-          <img width="100%"  :src="dialogImageUrl" alt="">
+        <el-dialog :visible.sync="dialogVisible" append-to-body>
+          <img width="100%" :src="dialogImageUrl" alt="">
         </el-dialog>
       </div>
     </el-dialog>
     <div slot="footer" style="text-align:center;padding-top:15px;">
+      <el-button type="success" v-show="biggest" @click="mWin(1)">最大化窗口</el-button>
+      <el-button type="success" v-show="normal" @click="mWin(2)">正常窗口</el-button>
       <el-button type="success" @click="batch">批量添加</el-button>
       <el-button type="warning" @click="exportOrder">导出</el-button>
       <el-button type="primary" @click.native="saveData('form')">保存</el-button>
@@ -172,362 +173,409 @@
 </template>
 
 <script>
-    import {mapGetters} from "vuex";
-    import {getOrderNum, stockList, saveSale, saleInfo, updateSale,exportorder,getWarehouse} from "@/api/indent/sales";
-    import {getInfo} from "@/api/user";
-    import List from "@/components/List";
+  import {mapGetters} from 'vuex'
+  import {getOrderNum, stockList, saveSale, saleInfo, updateSale, exportorder, getWarehouse} from '@/api/indent/sales'
+  import {getInfo} from '@/api/user'
+  import List from '@/components/List'
 
-    export default {
-        components: {
-            List
-        },
-        computed: {
-            ...mapGetters(["node"])
-        },
-        props: {
-            oid: {
-                type: Number,
-                default: null
-            },
-            plas: {
-                type: Number,
-                default: null
-            },
-            orderId: {
-                type: String,
-                default: null
-            },
-            createTime: {
-                type: String,
-                default: null
-            }
-        },
-        data() {
-            return {
-                fileList:[],
-                num1: 1,
-                hideUpload:true,
-                dialogImageUrl: '',
-                dialogVisible: false,
-                alter: null,
-                plaId: null,
-                tpvisible:null,
-                visible: null,
-                form: {
-                    goods:null,
-                    warehouse:null,
-                    fid: null,
-                    orderId: null,
-                    createTime: null,
-                    name: null, // 客户名称
-                    code: null, // 客户编号
-                },
-                rules: {
-                    name: [
-                        {required: true, message: '请输入客户名称', trigger: 'blur'}
-                    ],
+  export default {
+    components: {
+      List
+    },
+    computed: {
+      ...mapGetters(["node"]),
+      tables: function() {
+        var search = this.search
+        if (search) {
+          /*return this.list.filter(function(dataNews) {
+            return Object.keys(dataNews).some(function(key) {
+              return String(dataNews[key]).toLowerCase().includes(search.toLowerCase())
+            })
+          })*/
+          //this.fetchData({ search: search })
 
-                },
-                value1:[],
-                loading: false,
-                list: {},
-                multipleSelection: [],
-                getTime: function () {
-                    var _this = this;
-                    let yy = new Date().getFullYear();
-                    let mm = new Date().getMonth() + 1;
-                    let dd = new Date().getDate();
-                    let hh = new Date().getHours();
-                    let mf = new Date().getMinutes() < 10 ? '0' + new Date().getMinutes() : new Date().getMinutes();
-                    let ss = new Date().getSeconds() < 10 ? '0' + new Date().getSeconds() : new Date().getSeconds();
-                    _this.form.createTime = yy + '-' + mm + '-' + dd + ' ' + hh + ':' + mf + ':' + ss;
-                },
-                tList: [],
-                obj: {},
-                type: null,
-                columns: [
-                    {text: "gid", name: "gid", default: false},
-                    {text: "商品名称", name: "goodName"},
-                    {text: "编码", name: "goodCode"},
-                    {text: "型号", name: "standard"},
-                    {text: "计量单位", name: "unitOfMea"},
-                    {text: "数量", name: "num"},
-                    {text: "仓库", name: "wareHouseName"},
-                    {text: "单价", name: "price"},
-                ], columns2: [
-                    {text: "gid", name: "gid", default: false},
-                    {text: "商品名称", name: "goodName"},
-                    {text: "编码", name: "goodCode"},
-                    {text: "型号", name: "standard"},
-                    {text: "计量单位", name: "unitOfMea"},
-                    {text: "单价", name: "price"},
-                    {text: "仓库", name: "wareHouseName"},
-                    {text: "下单数量", name: "num"},
-                    {text: "实发数量", name: "actualNum"},
-                ],
-            };
-        },
-        created() {
-
-        },
-        mounted() {
-            console.log(this.plas)
-            /*this.tableData();*/
-            this.plaId = this.plas;
-            this.wFormat();
-            this.getUserInfo();
-            this.fetchData();
-            if (typeof (this.oid) != undefined && this.oid != null) {
-                this.form.orderId =  this.orderId
-                this.form.createTime =  this.createTime
-                this.tableData(this.oid);
-            }else{
-                this.getTime();
-                getOrderNum().then(res => {
-                    this.form.orderId = res.data
-                });
-            }
-        },
-        methods: {
-            // 下载文件
-            download (res) {
-                if (!res.data) {
-                    return
-                }
-                let url = window.URL.createObjectURL(new Blob([res.data]))
-                let link = document.createElement('a')
-                link.style.display = 'none'
-                link.href = url
-                link.setAttribute('download', res.headers['content-disposition'].split('filename=')[1])
-
-                document.body.appendChild(link)
-                link.click()
-            },
-            wareChange(val) {
-                this.fetchData();
-            },
-            query() {
-               this.fetchData(this.form.goods);
-            },
-            deleteRow(index, rows) {
-                /*for (let i = 0;i < this.fList.length;i++){
-                    if (this.fList[i].gid === rows[index].gid){
-                        this.fList[i].isDel = 1;
-                    }
-                }*/
-                rows.splice(index, 1);
-            },
-            exportOrder(){
-                let list = this.tList
-                let array = []
-                if (list.length > 0) {
-                    for (const i in list) {
-                        var jbj = {}
-                        jbj.gid = list[i].gid
-                        jbj.goodCode = list[i].goodCode
-                        jbj.goodName = list[i].goodName
-                        jbj.num = list[i].num
-                        array.push(jbj)
-                    }
-                    /* formData格式提交： */
-                   /* let formData = new FormData();
-                    for(var key in array){
-                        formData.append(key,array[key]);
-                    }*/
-                    exportorder(array).then(res => {
-                        this.download(res)
-                        /*  this.$emit('hideDialog', false)
-                          this.$emit('uploadList')*/
-                    });
-                }
-            },
-            //批量多选
-            batch() {
-                var list = JSON.parse(JSON.stringify(this.multipleSelection)),
-                    tList = this.tList;
-                //判断添加到待确认的数据是否重复
-                for (var j in list) {
-                    var number = 0;
-                    for (var i in tList) {
-                        if (list[j]['gid'] == tList[i]['gid']) {
-                            this.$set(tList, i, {
-                                ...tList[i],
-                                num: parseFloat(tList[i].num) + 1
-                            });
-                            number++;
-                            break;
-                        }
-                    }
-                    //false
-                    if (number == 0) {
-                        //查询窗口插入数据
-                        list[j].num=1
-                        this.tList.push(list[j])
-                    }
-                }
-
-            },
-            handlePictureCardPreview(file) {
-                this.dialogImageUrl = file.url;
-                this.dialogVisible = true;
-            },
-            handleChange(value) {
-                console.log(value);
-            },
-            //监听每页显示几条
-            handleSize(val) {
-                this.list.pageSize = val
-                this.fetchData(this.node.data.fid, this.node.data.type);
-            },
-            //监听当前页
-            handleCurrent(val) {
-                this.list.pageNum = val;
-                this.fetchData(this.node.data.fid, this.node.data.type);
-            },
-            //添加数量->待确认区
-            saveNum() {
-                if (!this.alter) {
-                    this.$set(this.obj, 'num', this.num1);
-                    var tList = this.tList,
-                        number = 0,
-                        obj = this.obj;
-                    //判断添加到待确认的数据是否重复
-                    for (var i in tList) {
-                        if (obj['gid'] == tList[i]['gid']) {
-                            this.$set(tList, i, {...tList[i], num: parseFloat(tList[i].num) + parseFloat(obj['num'])});
-                            number++;
-                            break;
-                        }
-                    }
-                    //false
-                    if (number == 0) {
-                        //查询窗口插入数据
-                        this.tList.push(obj)
-                    }
-                } else {
-                    this.$set(this.obj, 'num', this.num1);
-                }
-                this.num1 = 1;
-                this.visible = false;
-            },
-            //修改数量
-            alterNum(row) {
-                this.num1 = row['num'];
-                this.alter = true;
-                this.obj = row;
-                this.visible = true;
-                console.log(this.obj)
-            },
-            //保存
-            saveData(form) {
-                this.$refs[form].validate((valid) => {
-                    //判断必填项
-                    if (valid) {
-                        let obj = {}, list = this.tList
-                        obj.plaId = this.plaId
-                        let array = []
-                        if (list.length > 0) {
-                            for (const i in list) {
-                                var jbj = {}
-                                jbj.gid = list[i].gid
-                                jbj.num = list[i].num
-                                array.push(jbj)
-                            }
-                            if (typeof (this.oid) != undefined && this.oid != null) {
-                                obj.oid = this.oid
-                                obj.orderGoods = array
-                                updateSale(obj).then(res => {
-                                    this.$emit('hideDialog', false)
-                                    this.$emit('uploadList')
-                                });
-                            } else {
-                                obj.orderGoods = array;
-                                saveSale(obj).then(res => {
-                                    this.$emit('hideDialog', false)
-                                    this.$emit('uploadList')
-                                });
-                            }
-                        } else {
-                            return this.$message({
-                                message: "无数据",
-                                type: "warning"
-                            });
-                        }
-                    }
-                })
-            },
-            handleAdd(val) {
-                this.num1 = 1;
-                this.obj = JSON.parse(JSON.stringify(val))
-                this.alter = false
-                this.visible = true
-            },
-            //查看图片
-            handleLook(val) {
-                let imgArray=val.img.split(',');
-                console.log(imgArray.length)
-                if(imgArray.length>0&&val.img != ""){
-                //判断图片是否为空
-                     this.tpvisible = true;
-                    if(this.fileList.length>0){
-                        this.fileList[0].url = 'http://120.78.168.141:8091/web'+imgArray[0];
-                    }else{
-                        this.fileList=[]
-                        this.fileList.push({
-                            url:'http://120.78.168.141:8091/web'+imgArray[0]
-                        })
-                    }
-                }else{
-                    return this.$message({
-                        message: "无图片",
-                        type: "warning"
-                    });
-                }
-
-            },
-            handleSelectionChange(val) {
-                this.multipleSelection = val
-            },
-            tableData(oid) {
-                saleInfo(oid).then(res => {
-                    if(res.flag){
-                        this.tList = res.data
-                    }
-                })
-            },
-            fetchData(val) {
-                this.loading = true;
-                const data = {
-                    goodName: this.form.goods || '',
-                    wid: this.form.wid || '',
-                    plaId: this.plaId,
-                    pageNum: this.list.current || 1,
-                    pageSize: this.list.size || 50
-                };
-                stockList(data).then(res => {
-                    if(res.flag){
-                        this.loading = false;
-                        this.list = res.data;
-                    }
-                })
-            },
-            wFormat(){
-                getWarehouse().then(res => {
-                    if(res.flag) {
-                        this.value1 = res.data;
-                        return;
-                    }
-                })
-            },
-            getUserInfo() {
-                getInfo().then(res => {
-                    if(res.flag) {
-                       this.form.name = res.data["name"];
-                    }
-                })
-            }
+          //return this.list
+        } else {
+          return this.list
         }
+      }
+    },
+    props: {
+      oid: {
+        type: Number,
+        default: null
+      },
+      plas: {
+        type: Number,
+        default: null
+      },
+      orderId: {
+        type: String,
+        default: null
+      },
+      createTime: {
+        type: String,
+        default: null
+      }
+    },
+    data() {
+      return {
+        biggest:true,
+        normal:false,
+        fileList: [],
+        num1: 1,
+        hideUpload: true,
+        dialogImageUrl: '',
+        dialogVisible: false,
+        alter: null,
+        plaId: null,
+        tpvisible: null,
+        visible: null,
+        search: '',
+        form: {
+          goods: null,
+          warehouse: null,
+          fid: null,
+          orderId: null,
+          createTime: null,
+          name: null, // 客户名称
+          code: null, // 客户编号
+        },
+        rules: {
+          name: [
+            {required: true, message: '请输入客户名称', trigger: 'blur'}
+          ],
+
+        },
+        value1: [],
+        loading: false,
+        list: [],
+        multipleSelection: [],
+        getTime: function () {
+          var _this = this;
+          let yy = new Date().getFullYear();
+          let mm = new Date().getMonth() + 1;
+          let dd = new Date().getDate();
+          let hh = new Date().getHours();
+          let mf = new Date().getMinutes() < 10 ? '0' + new Date().getMinutes() : new Date().getMinutes();
+          let ss = new Date().getSeconds() < 10 ? '0' + new Date().getSeconds() : new Date().getSeconds();
+          _this.form.createTime = yy + '-' + mm + '-' + dd + ' ' + hh + ':' + mf + ':' + ss;
+        },
+        tList: [],
+        obj: {},
+        type: null,
+        columns: [
+          {text: "gid", name: "gid", default: false},
+          {text: "siId", name: "siId", default: false},
+          {text: "商品名称", name: "goodName"},
+          {text: "编码", name: "goodCode"},
+          {text: "型号", name: "standard"},
+          {text: "计量单位", name: "unitOfMea"},
+          {text: "数量", name: "num"},
+          {text: "仓库", name: "wareHouseName"},
+          {text: "单价", name: "price"},
+        ], columns2: [
+          {text: "gid", name: "gid", default: false},
+          {text: "siId", name: "siId", default: false},
+          {text: "商品名称", name: "goodName"},
+          {text: "编码", name: "goodCode"},
+          {text: "型号", name: "standard"},
+          {text: "计量单位", name: "unitOfMea"},
+          {text: "单价", name: "price"},
+          {text: "仓库", name: "wareHouseName"},
+          {text: "下单数量", name: "num"},
+          {text: "实发数量", name: "actualNum"},
+        ],
+      };
+    },
+    created() {
+
+    },
+    mounted() {
+      console.log(this.plas)
+      /*this.tableData();*/
+      this.plaId = this.plas;
+      this.wFormat();
+      this.getUserInfo();
+      this.fetchData();
+      if (typeof (this.oid) != undefined && this.oid != null) {
+        this.form.orderId = this.orderId
+        this.form.createTime = this.createTime
+        this.tableData(this.oid);
+      } else {
+        this.getTime();
+        getOrderNum().then(res => {
+          this.form.orderId = res.data
+        });
+      }
+    },
+    methods: {
+      //调整窗口
+      mWin(val) {
+        if(val == 1){
+          this.biggest = false
+          this.normal = true
+          this.$emit('operation',val)
+        }else{
+          this.biggest = true
+          this.normal = false
+          this.$emit('operation',val)
+        }
+
+      },
+      // 下载文件
+      download(res) {
+        if (!res.data) {
+          return
+        }
+        let url = window.URL.createObjectURL(new Blob([res.data]))
+        let link = document.createElement('a')
+        link.style.display = 'none'
+        link.href = url
+        link.setAttribute('download', res.headers['content-disposition'].split('filename=')[1])
+        document.body.appendChild(link)
+        link.click()
+      },
+      inat(value) {
+        if(value.data == null) {
+          this.query()
+        }else{
+          if(value.data.replace(/\s+/g, "") != "") {
+            this.search = value.data
+            this.query()
+          }
+        }
+      },
+      wareChange(val) {
+        this.wFormat(val);
+      },
+      query() {
+        this.fetchData();
+      },
+      deleteRow(index, rows) {
+        /*for (let i = 0;i < this.fList.length;i++){
+            if (this.fList[i].gid === rows[index].gid){
+                this.fList[i].isDel = 1;
+            }
+        }*/
+        rows.splice(index, 1);
+      },
+      exportOrder() {
+        let list = this.tList
+        let array = []
+        if (list.length > 0) {
+          for (const i in list) {
+            var jbj = {}
+            jbj.gid = list[i].gid
+            jbj.siId = list[i].siId
+            jbj.goodCode = list[i].goodCode
+            jbj.goodName = list[i].goodName
+            jbj.num = list[i].num
+            array.push(jbj)
+          }
+          /* formData格式提交： */
+          /* let formData = new FormData();
+           for(var key in array){
+               formData.append(key,array[key]);
+           }*/
+          exportorder(array).then(res => {
+            console.log(res)
+            this.download(res)
+            /*  this.$emit('hideDialog', false)
+              this.$emit('uploadList')*/
+          });
+        }
+      },
+      //批量多选
+      batch() {
+        var list = JSON.parse(JSON.stringify(this.multipleSelection)),
+          tList = this.tList;
+        //判断添加到待确认的数据是否重复
+        for (var j in list) {
+          var number = 0;
+          for (var i in tList) {
+            if (list[j]['siId'] == tList[i]['siId']) {
+              this.$set(tList, i, {
+                ...tList[i],
+                num: parseFloat(tList[i].num) + 1
+              });
+              number++;
+              break;
+            }
+          }
+          //false
+          if (number == 0) {
+            //查询窗口插入数据
+            list[j].num = 1
+            this.tList.push(list[j])
+          }
+        }
+
+      },
+      handlePictureCardPreview(file) {
+        this.dialogImageUrl = file.url;
+        this.dialogVisible = true;
+      },
+      handleChange(value) {
+        console.log(value);
+      },
+      //监听每页显示几条
+      handleSize(val) {
+        this.list.pageSize = val
+        this.fetchData(this.node.data.fid, this.node.data.type);
+      },
+      //监听当前页
+      handleCurrent(val) {
+        this.list.pageNum = val;
+        this.fetchData(this.node.data.fid, this.node.data.type);
+      },
+      //添加数量->待确认区
+      saveNum() {
+        if (!this.alter) {
+          this.$set(this.obj, 'num', this.num1);
+          var tList = this.tList,
+            number = 0,
+            obj = this.obj;
+          //判断添加到待确认的数据是否重复
+          for (var i in tList) {
+            if (obj['siId'] == tList[i]['siId']) {
+              this.$set(tList, i, {...tList[i], num: parseFloat(tList[i].num) + parseFloat(obj['num'])});
+              number++;
+              break;
+            }
+          }
+          //false
+          if (number == 0) {
+            //查询窗口插入数据
+            this.tList.push(obj)
+          }
+        } else {
+          this.$set(this.obj, 'num', this.num1);
+        }
+        this.num1 = 1;
+        this.visible = false;
+      },
+      //修改数量
+      alterNum(row) {
+        this.num1 = row['num'];
+        this.alter = true;
+        this.obj = row;
+        this.visible = true;
+        console.log(this.obj)
+      },
+      //保存
+      saveData(form) {
+        this.$refs[form].validate((valid) => {
+          //判断必填项
+          if (valid) {
+            let obj = {}, list = this.tList
+            obj.plaId = this.plaId
+            let array = []
+            if (list.length > 0) {
+              for (const i in list) {
+                var jbj = {}
+                jbj.gid = list[i].gid
+                jbj.siId = list[i].siId
+                jbj.num = list[i].num
+                array.push(jbj)
+              }
+              if (typeof (this.oid) != undefined && this.oid != null) {
+                obj.oid = this.oid
+                obj.orderGoods = array
+                updateSale(obj).then(res => {
+                  this.$emit('hideDialog', false)
+                  this.$emit('uploadList')
+                });
+              } else {
+                obj.orderGoods = array;
+                saveSale(obj).then(res => {
+                  this.$emit('hideDialog', false)
+                  this.$emit('uploadList')
+                });
+              }
+            } else {
+              return this.$message({
+                message: "无数据",
+                type: "warning"
+              });
+            }
+          }
+        })
+      },
+      handleAdd(val) {
+        this.num1 = 1;
+        this.obj = JSON.parse(JSON.stringify(val))
+        this.alter = false
+        this.visible = true
+      },
+      //查看图片
+      handleLook(val) {
+        let imgArray = val.img.split(',');
+        console.log(imgArray.length)
+        if (imgArray.length > 0 && val.img != "") {
+          //判断图片是否为空
+          this.tpvisible = true;
+          if (this.fileList.length > 0) {
+            this.fileList[0].url = 'http://test.gzfzdev.com:8080/web' + imgArray[0];
+          } else {
+            this.fileList = []
+            this.fileList.push({
+              url: 'http://test.gzfzdev.com:8080/web' + imgArray[0]
+            })
+          }
+        } else {
+          return this.$message({
+            message: "无图片",
+            type: "warning"
+          });
+        }
+
+      },
+      handleSelectionChange(val) {
+        this.multipleSelection = val
+      },
+      tableData(oid) {
+        saleInfo(oid).then(res => {
+          if (res.flag) {
+            this.tList = res.data
+          }
+        })
+      },
+      fetchData(val) {
+        this.loading = true;
+        const data = {
+          //wid: this.form.wid || '',
+
+          pageNum: this.list.current || 1,
+          pageSize: this.list.size || 50
+        };
+        const obj = { plaId: this.plaId }
+        this.search != '' ? obj.goodName = this.search : null
+        console.log(obj)
+        stockList(data, obj).then(res => {
+          if (res.flag) {
+            this.loading = false
+            this.list = res.data.records
+          }
+        })
+      },
+      wFormat() {
+        getWarehouse().then(res => {
+          if (res.flag) {
+            this.value1 = res.data;
+            return;
+          }
+        })
+      },
+      getUserInfo() {
+        getInfo().then(res => {
+          if (res.flag) {
+            this.form.name = res.data["name"];
+          }
+        })
+      }
     }
+  }
 </script>
 
 <style>

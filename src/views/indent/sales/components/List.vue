@@ -39,7 +39,7 @@
 
 <script>
     import {mapGetters} from "vuex";
-    import {salesList, delSaleOrder} from "@/api/indent/sales";
+    import {salesList, delSaleOrder,salesListT} from "@/api/indent/sales";
     import List from "@/components/List";
 
     export default {
@@ -55,11 +55,21 @@
                 list: {},
                 columns: [
                     {text: "oid", name: "oid", default: false},
-                    {text: "订单单号", name: "orderId"},
-                    {text: "金额", name: "price"},
-                    {text: "下单时间", name: "createTime"},
+                  {text: "日期", name: "createTime"},
+                    {text: "订单单号", name: "orderNum"},
+                  {text: "购货单位", name: "customer"},
+                  {text: "物料代码", name: "goodCode"},
+                  {text: "物料名称", name: "goodName"},
+                  {text: "规格型号", name: "standard"},
+                  {text: "单位", name: "unitOfMea"},
+                  {text: "订单数量", name: "num"},
+                  {text: "实发数量", name: "actualNum"},
+                  {text: "单价", name: "sellPrice"},
+                    {text: "金额", name: "totalPrice"},
+                  {text: "发货仓库", name: "plaName"},
+                  {text: "商品图片", name: "img"},
                     {text: "审核状态", name: "auditStatus"},
-                    {text: "状态", name: "status"},
+                    //{text: "状态", name: "status"},
                 ]
             };
         },
@@ -75,13 +85,22 @@
                 this.fetchData();
             },
             dblclick(obj) {
+              if(obj.row.auditStatus == '已审核'){
+                return this.$message({
+                  message: "该订单已审核",
+                  type: "warning"
+                });
+              }else{
                 const data = {
-                    oid: obj.row.oid,
-                    plas: obj.row.plaId,
-                    orderId: obj.row.orderId,
-                    createTime: obj.row.createTime
+                  oid: obj.row.oid,
+                  plas: obj.row.plas,
+                  orderId: obj.row.orderNum,
+                  createTime: obj.row.addTime,
                 }
                 this.$emit('showDialog', data)
+
+              }
+
             },
             //监听单击某一行
             rowClick(obj) {
@@ -94,22 +113,42 @@
                 });
             },
             fetchData(val) {
-                this.loading = true;
+                this.loading = true
                 const data = {
                     /*  fid: fid,
                       type: type,*/
                     pageNum: this.list.current || 1,
                     pageSize: this.list.size || 50
-                };
-                const query = {
+                }
+               /* const query = {
                     query: typeof (val) == "undefined" ? '' : val.query,
                     endDate: typeof (val) == "undefined" ? '' : val.endDate,
-                    startDate: typeof (val) == "undefined" ? '' : val.startDate,
-                };
-                salesList(data, query).then(res => {
-                    this.loading = false;
-                    if(res.flag&&res.data!=null){
-                        this.list = res.data;
+                    startDate: typeof (val) == "undefined" ? '' : val.startDate
+                }*/
+              salesListT(data, val).then(res => {
+                    this.loading = false
+                    if(res.flag && res.data != null) {
+                      let record = res.data.records
+                      let obj = []
+                        for(const i in record) {
+                          for(const a in record[i].orderDetails) {
+                            record[i].orderDetails[a].oid = record[i].oid
+                            record[i].orderDetails[a].addTime = record[i].createTime
+                            record[i].orderDetails[a].plas = record[i].plaId
+                            record[i].orderDetails[a].plaName = record[i].plaName
+                            record[i].orderDetails[a].customer = record[i].customer
+                            record[i].orderDetails[a].auditStatus = record[i].auditStatus
+                            obj.push(record[i].orderDetails[a])
+                          }
+                        }
+                      this.list= {
+                        current: res.data.current,
+                        pages: res.data.pages,
+                        size: res.data.size,
+                        total: res.data.total,
+                        records: obj
+                      }
+                        console.log(this.list)
                     }
                 });
             }

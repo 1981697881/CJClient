@@ -9,13 +9,14 @@
     </div>
 
     <el-dialog
+      :fullscreen="isfullscreen"
       :visible.sync="visible"
       title="退货信息"
       v-if="visible"
       :width="'70%'"
       destroy-on-close
     >
-      <returns @hideDialog="hideWindow" @uploadList="upload" :reOdId="reOdId" :img="img"></returns>
+      <returns @hideDialog="hideWindow" @uploadList="upload" :reOdId="reOdId" :img="img" @operation="operation"></returns>
 
     </el-dialog>
   </div>
@@ -35,6 +36,7 @@
                 visible: null,
                 fid: null,
                 reOdId: null,
+                isfullscreen: null,
                 img:null,
                 orderId: null,
                 treeId: null, // null
@@ -49,8 +51,10 @@
                 this.visible = val
             },
             handlerDialog(obj) {
-                if (obj) this.reOdId = obj.reOdId; this.img = obj.img
+              console.log(obj)
+                if (obj) this.reOdId = obj.reId; this.img = obj.image
                 this.visible = true
+              this.$store.dispatch("list/setClickData", '')
             },
             handlerNode(node) {
                 console.log(node.data)
@@ -63,6 +67,14 @@
           //查询
           query(val){
             this.$refs.list.fetchData(val)
+          },
+          //操作窗口
+          operation(val) {
+            if(val == 1) {
+              this.isfullscreen = true
+            }else {
+              this.isfullscreen = false
+            }
           },
             //更新列表
             upload(){

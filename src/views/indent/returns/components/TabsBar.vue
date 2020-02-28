@@ -17,8 +17,8 @@
         </el-form-item>
         </el-col>
         <el-col :span="3">
-          <el-form-item :label="'单号'">
-            <el-input v-model="search.keyword" placeholder="输入单号查询"/>
+          <el-form-item :label="'关键字'">
+            <el-input v-model="search.keyword" placeholder="输入关键字查询"/>
           </el-form-item>
         </el-col>
         <el-col :span="2">
@@ -27,6 +27,7 @@
           <el-button-group style="float:right">
             <el-button :size="'mini'" type="primary" icon="el-icon-plus" @click.native="handleCreate">新增</el-button>
             <el-button :size="'mini'" type="primary" icon="el-icon-edit" @click.native="handleAlter">修改</el-button>
+            <el-button :size="'mini'" type="primary" icon="el-icon-download" @click="exportOrder">导出</el-button>
             <el-button :size="'mini'" type="primary" icon="el-icon-refresh" @click.native="upload">刷新</el-button>
             <el-button :size="'mini'" type="warning" icon="el-icon-delete" @click="delReturnOrder">删除</el-button>
           </el-button-group>
@@ -39,6 +40,7 @@
 // ---------------------------  新增客户没做完
 
 import { mapGetters } from "vuex";
+import { exportData } from "@/api/indent/returns";
 export default {
     components: {},
     computed: {
@@ -87,8 +89,8 @@ export default {
         })
     },
       delReturnOrder(){
-          if (this.clickData.reOdId) {
-              this.$emit('delOrder',this.clickData.reOdId)
+          if (this.clickData.reId) {
+              this.$emit('delOrder',this.clickData.reId)
           } else {
               this.$message({
                   message: "无选中行",
@@ -102,16 +104,45 @@ export default {
       this.value4 = ''
     },
     query() {
-
-      this.$emit('queryOrder', {
-        query: this.search.keyword || '',
-        endDate: this.value4[1] || '',
-        startDate: this.value4[0] || '',
+      this.$emit('queryOrder', this.qFilter())
+    },
+    // 查询条件过滤
+    qFilter() {
+      let obj = {}
+      this.search.keyword != null || this.search.keyword != undefined ? obj.query = this.search.keyword : null
+      this.value4[1] != null || this.value4[1] != undefined ? obj.endDate = this.value4[1] : null
+      this.value4[0] != null || this.value4[0] != undefined ? obj.startDate = this.value4[0] : null
+      return obj
+    },
+    // 下载文件
+    download(res) {
+      if (!res.data) {
+        return
+      }
+      let url = window.URL.createObjectURL(new Blob([res.data]))
+      let link = document.createElement('a')
+      link.style.display = 'none'
+      link.href = url
+      link.setAttribute('download', res.headers['content-disposition'].split('filename=')[1])
+      document.body.appendChild(link)
+      link.click()
+    },
+    exportOrder() {
+      exportData(this.qFilter()).then(res => {
+        console.log(res)
+        this.download(res)
       })
     },
-      handleAlter(){
-          if (this.clickData.reOdId) {
-              this.$emit('showDialog',this.clickData)
+      handleAlter() {
+          if (this.clickData.reId) {
+            if (this.clickData.isAudit == '已审核') {
+              return this.$message({
+                message: "该单已审核",
+                type: "warning"
+              })
+            }else{
+              this.$emit('showDialog', this.clickData)
+            }
           } else {
               this.$message({
                   message: "无选中行",

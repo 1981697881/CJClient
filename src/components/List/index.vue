@@ -88,7 +88,7 @@ export default {
     //是否自适应宽度，不自适应宽度默认为120px
     selfAdaption: {
       type: Boolean,
-      default: true
+      default: false
     },
     //是否自定义高度 默认100%
     height:{
