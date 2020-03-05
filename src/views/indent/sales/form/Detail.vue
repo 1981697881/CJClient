@@ -165,9 +165,9 @@
     <div slot="footer" style="text-align:center;padding-top:15px;">
       <el-button type="success" v-show="biggest" @click="mWin(1)">最大化窗口</el-button>
       <el-button type="success" v-show="normal" @click="mWin(2)">正常窗口</el-button>
-      <el-button type="success" @click="batch">批量添加</el-button>
-      <el-button type="warning" @click="exportOrder">导出</el-button>
-      <el-button type="primary" @click.native="saveData('form')">保存</el-button>
+      <el-button type="success" v-show="isAdd"  @click="batch">批量添加</el-button>
+      <el-button type="warning" v-show="isAdd" @click="exportOrder">导出</el-button>
+      <el-button type="primary" v-show="isAdd" @click.native="saveData('form')">保存</el-button>
     </div>
   </div>
 </template>
@@ -177,6 +177,9 @@
   import {getOrderNum, stockList, saveSale, saleInfo, updateSale, exportorder, getWarehouse} from '@/api/indent/sales'
   import {getInfo} from '@/api/user'
   import List from '@/components/List'
+  import {
+    getPer
+  } from '@/utils/auth'
 
   export default {
     components: {
@@ -208,6 +211,10 @@
       plas: {
         type: Number,
         default: null
+      },
+      isAdd: {
+        type: Boolean,
+        default: true
       },
       orderId: {
         type: String,
@@ -273,7 +280,7 @@
           {text: "计量单位", name: "unitOfMea"},
           {text: "数量", name: "num"},
           {text: "仓库", name: "wareHouseName"},
-          {text: "单价", name: "price"},
+          {text: "单价", name: "price", default:false},
         ], columns2: [
           {text: "gid", name: "gid", default: false},
           {text: "siId", name: "siId", default: false},
@@ -281,7 +288,7 @@
           {text: "编码", name: "goodCode"},
           {text: "型号", name: "standard"},
           {text: "计量单位", name: "unitOfMea"},
-          {text: "单价", name: "price"},
+          {text: "单价", name: "sellPrice", default:false},
           {text: "仓库", name: "wareHouseName"},
           {text: "下单数量", name: "num"},
           {text: "实发数量", name: "actualNum"},
@@ -289,7 +296,19 @@
       };
     },
     created() {
-
+      //判断价格权限
+      if(unescape(getPer('per').replace(/\\u/gi, '%u')) === '价格') {
+        for(let i in this.columns) {
+          if(this.columns[i].name == 'price') {
+            this.columns[i].default = true
+          }
+        }
+        for(let i in this.columns2) {
+          if(this.columns2[i].name == 'sellPrice') {
+            this.columns2[i].default = true
+          }
+        }
+      }
     },
     mounted() {
       console.log(this.plas)
@@ -516,11 +535,11 @@
           //判断图片是否为空
           this.tpvisible = true;
           if (this.fileList.length > 0) {
-            this.fileList[0].url = 'http://test.gzfzdev.com:8080/web' + imgArray[0];
+            this.fileList[0].url = 'http://120.78.168.141:8090/web' + imgArray[0];
           } else {
             this.fileList = []
             this.fileList.push({
-              url: 'http://test.gzfzdev.com:8080/web' + imgArray[0]
+              url: 'http://120.78.168.141:8090/web' + imgArray[0]
             })
           }
         } else {

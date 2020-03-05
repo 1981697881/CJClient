@@ -41,6 +41,9 @@
     import {mapGetters} from "vuex";
     import {salesList, delSaleOrder,salesListT} from "@/api/indent/sales";
     import List from "@/components/List";
+    import {
+      getPer
+    } from '@/utils/auth'
 
     export default {
         components: {
@@ -53,6 +56,7 @@
             return {
                 loading: false,
                 list: {},
+                field: false,
                 columns: [
                     {text: "oid", name: "oid", default: false},
                   {text: "日期", name: "createTime"},
@@ -64,8 +68,8 @@
                   {text: "单位", name: "unitOfMea"},
                   {text: "订单数量", name: "num"},
                   {text: "实发数量", name: "actualNum"},
-                  {text: "单价", name: "sellPrice"},
-                    {text: "金额", name: "totalPrice"},
+                  {text: "单价", name: "sellPrice", default: false },
+                    {text: "金额", name: "totalPrice", default: false },
                   {text: "发货仓库", name: "plaName"},
                   {text: "商品图片", name: "img"},
                     {text: "审核状态", name: "auditStatus"},
@@ -73,6 +77,16 @@
                 ]
             };
         },
+      created() {
+          //判断价格权限
+        if(unescape(getPer('per').replace(/\\u/gi, '%u')) === '价格') {
+          for(let i in this.columns) {
+              if(this.columns[i].name == 'sellPrice' || this.columns[i].name == 'totalPrice') {
+                this.columns[i].default = true
+              }
+          }
+        }
+      },
         methods: {
             //监听每页显示几条
             handleSize(val) {
@@ -86,10 +100,14 @@
             },
             dblclick(obj) {
               if(obj.row.auditStatus == '已审核'){
-                return this.$message({
-                  message: "该订单已审核",
-                  type: "warning"
-                });
+                const data = {
+                  oid: obj.row.oid,
+                  plas: obj.row.plas,
+                  orderId: obj.row.orderNum,
+                  createTime: obj.row.addTime,
+                  isAdd: false
+                }
+                this.$emit('showDialog', data)
               }else{
                 const data = {
                   oid: obj.row.oid,

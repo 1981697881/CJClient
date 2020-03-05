@@ -15,7 +15,7 @@
       :width="'70%'"
       destroy-on-close
     >
-      <info @hideDialog="hideWindow" @uploadList="upload" :oid="oid" :plas="plas" :orderId="orderId" :createTime="createTime" @operation="operation"></info>
+      <info @hideDialog="hideWindow" @uploadList="upload" :oid="oid" :plas="plas" :isAdd="isAdd" :orderId="orderId" :createTime="createTime" @operation="operation"></info>
     </el-dialog>
     <el-dialog
       :visible.sync="isSh"
@@ -46,6 +46,7 @@
             return {
                 visible: null,
                 isSh: null,
+              isAdd: null,
               isfullscreen: null,
               isrfullscreen: null,
                 oid: null,
@@ -66,7 +67,7 @@
             },
             handlerDialog(obj) {
                 console.log(obj)
-                if (obj) this.oid = obj.oid;this.plas=obj.plas;this.orderId=obj.orderId;this.createTime=obj.createTime;
+                if (obj) this.oid = obj.oid;this.plas=obj.plas;this.orderId=obj.orderId;this.createTime=obj.createTime;this.isAdd=obj.isAdd;
                 this.visible = true
                 this.$store.dispatch("list/setClickData", '')
             },

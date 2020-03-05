@@ -20,6 +20,7 @@
       <el-table-column
         v-for="(t,i) in columns"
         :key="i"
+        sortable
         :prop="t.name"
         v-if="t.default!=undefined?t.default:true"
         :label="t.text"
@@ -100,6 +101,11 @@ export default {
     //监听多选 参数-所有选中的值
     handleSelectionChange(val){
        this.$store.dispatch('list/setSelections',val)
+    },
+    // 从后台获取数据,重新排序
+    changeSort (val) {
+      console.log(val) // column: {…} order: "ascending" prop: "date"
+      // 根据当前排序重新获取后台数据,一般后台会需要一个排序的参数
     },
     getSummaries(param) {
       const { columns, data } = param;

@@ -151,13 +151,13 @@
                         this.plaArray = res.data;
                         this.plas = res.data[0].plaId;
                     });
-                    this.visible = true;
+                    //this.visible = true;
                 }
 
             },
             submitUpload(){
                 this.$refs.upload.submit();
-                this.visible = false;
+                //this.visible = false;
             },
             handleAdd() {
                 if(this.isUpload){
@@ -260,10 +260,14 @@
             handleAlter() {
                 if (this.clickData.oid) {
                   if(this.clickData.auditStatus == '已审核') {
-                    return this.$message({
-                      message: "该订单已审核",
-                      type: "warning"
-                    });
+                    this.$emit('showDialog', {
+                      oid: this.clickData.oid,
+                      plas: this.clickData.plas,
+                      orderId: this.clickData.orderNum,
+                      createTime: this.clickData.addTime,
+                      isAdd: false
+                    })
+
                   } else {
                     this.$emit('showDialog', {
                       oid: this.clickData.oid,

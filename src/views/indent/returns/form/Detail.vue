@@ -130,7 +130,7 @@
     <div slot="footer" style="text-align:center;padding-top:15px;">
       <el-button type="success" v-show="biggest" @click="mWin(1)">最大化窗口</el-button>
       <el-button type="success" v-show="normal" @click="mWin(2)">正常窗口</el-button>
-      <el-button type="primary" @click="saveData('form')">保存</el-button>
+      <el-button type="primary" v-show="isAdd" @click="saveData('form')">保存</el-button>
     </div>
   </div>
 </template>
@@ -140,6 +140,10 @@
   import {
     getToken
   } from '@/utils/auth'
+  import {
+    getPer
+  } from '@/utils/auth'
+
   import {getSaleOrder} from "@/api/indent/sales";
   import {saveReturn, getReturnOrder, alterReturn, uploadImgs, getOrderGoodsById} from "@/api/indent/returns";
   import List from "@/components/List";
@@ -149,6 +153,10 @@
       List
     },
     props: {
+      isAdd: {
+        type: Boolean,
+        default: true
+      },
       oid: {
         type: Number,
         default: null
@@ -210,7 +218,7 @@
           {text: "编码", name: "goodCode"},
           {text: "型号", name: "standard"},
           {text: "计量单位", name: "unitOfMea"},
-          {text: "单价", name: "price"},
+          {text: "单价", name: "sellPrice", default:false},
           {text: "仓库", name: "wareHouseName"},
           {text: "数量", name: "num"},
         ],
@@ -223,7 +231,14 @@
       };
     },
     created() {
-
+      //判断价格权限
+      if(unescape(getPer('per').replace(/\\u/gi, '%u')) === '价格') {
+        for(let i in this.columns1) {
+          if(this.columns1[i].name == 'sellPrice') {
+            this.columns1[i].default = true
+          }
+        }
+      }
     },
     mounted() {
       this.fileList = []
@@ -244,7 +259,7 @@
             this.images.push(imgArray[i].split('/web/returnOrder/img/')[1])
             //展示已有图片到窗口
             this.fileList.push({
-              url: 'http://test.gzfzdev.com:8080/web' + imgArray[i],
+              url: 'http://120.78.168.141:8090/web' + imgArray[i],
               name: imgArray[i].split('/web/returnOrder/img/')[1]
             })
           }

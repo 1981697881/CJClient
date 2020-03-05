@@ -98,12 +98,12 @@ export function getOrderGoodsById(data) {
       'authorization': getToken('rx'),
     },
     url: url,
-    method: 'get',
+    method: 'get'
   })
 }
 // 导出单据明细
 export function exportData(data) {
-  const url = '/Admin/export/returnOrderData'
+  const url = '/excel/export/returnOrderData'
   return request({
     headers: {
       'authorization': getToken('rx'),

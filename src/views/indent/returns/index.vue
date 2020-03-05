@@ -16,7 +16,7 @@
       :width="'70%'"
       destroy-on-close
     >
-      <returns @hideDialog="hideWindow" @uploadList="upload" :reOdId="reOdId" :img="img" @operation="operation"></returns>
+      <returns @hideDialog="hideWindow" @uploadList="upload" :isAdd="isAdd" :reOdId="reOdId" :img="img" @operation="operation"></returns>
 
     </el-dialog>
   </div>
@@ -36,6 +36,7 @@
                 visible: null,
                 fid: null,
                 reOdId: null,
+              isAdd:null,
                 isfullscreen: null,
                 img:null,
                 orderId: null,
@@ -52,7 +53,7 @@
             },
             handlerDialog(obj) {
               console.log(obj)
-                if (obj) this.reOdId = obj.reId; this.img = obj.image
+                if (obj) this.reOdId = obj.reId; this.img = obj.image;this.isAdd = obj.isAdd
                 this.visible = true
               this.$store.dispatch("list/setClickData", '')
             },
