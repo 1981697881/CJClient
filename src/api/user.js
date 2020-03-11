@@ -2,6 +2,18 @@ import request from '@/utils/request'
 import {
   getToken
 } from '@/utils/auth'
+// 下拉平台
+export function getPlas(data) {
+  const url = '/Admin/pla/list'
+  return request({
+    headers: {
+      'authorization': getToken('rx')
+    },
+    url: url,
+    method: 'get'
+  })
+}
+
 export function login(data) {
   return request({
     headers: {

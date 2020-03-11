@@ -27,8 +27,13 @@
       </el-row>
       <el-row :gutter="20">
         <el-col :span="12">
-          <el-form-item :label="'客户名称'" prop="name">
+          <el-form-item :label="'下单人名称'">
             <el-input v-model="form.name" :disabled="true"></el-input>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item :label="'下单人编码'" >
+            <el-input v-model="form.username" :disabled="true"></el-input>
           </el-form-item>
         </el-col>
         <!--<el-col :span="12">
@@ -187,21 +192,6 @@
     },
     computed: {
       ...mapGetters(["node"]),
-      tables: function() {
-        var search = this.search
-        if (search) {
-          /*return this.list.filter(function(dataNews) {
-            return Object.keys(dataNews).some(function(key) {
-              return String(dataNews[key]).toLowerCase().includes(search.toLowerCase())
-            })
-          })*/
-          //this.fetchData({ search: search })
-
-          //return this.list
-        } else {
-          return this.list
-        }
-      }
     },
     props: {
       oid: {
@@ -217,6 +207,14 @@
         default: true
       },
       orderId: {
+        type: String,
+        default: null
+      },
+      customer: {
+        type: String,
+        default: null
+      },
+      customerCode: {
         type: String,
         default: null
       },
@@ -246,7 +244,7 @@
           orderId: null,
           createTime: null,
           name: null, // 客户名称
-          code: null, // 客户编号
+          username: null // 客户编号
         },
         rules: {
           name: [
@@ -311,18 +309,19 @@
       }
     },
     mounted() {
-      console.log(this.plas)
       /*this.tableData();*/
-      this.plaId = this.plas;
-      this.wFormat();
-      this.getUserInfo();
-      this.fetchData();
+      this.plaId = this.plas
+      this.wFormat()
+      this.fetchData()
       if (typeof (this.oid) != undefined && this.oid != null) {
+        this.form.name = this.customer
+        this.form.username = this.customerCode
         this.form.orderId = this.orderId
         this.form.createTime = this.createTime
         this.tableData(this.oid);
       } else {
-        this.getTime();
+        this.getTime()
+        this.getUserInfo()
         getOrderNum().then(res => {
           this.form.orderId = res.data
         });
@@ -589,7 +588,8 @@
       getUserInfo() {
         getInfo().then(res => {
           if (res.flag) {
-            this.form.name = res.data["name"];
+            this.form.name = res.data["name"]
+            this.form.username = res.data["username"];
           }
         })
       }

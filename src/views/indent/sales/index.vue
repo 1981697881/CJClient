@@ -3,7 +3,7 @@
     <!--<Tree class="list-tree" @handler-node="handlerNode" />-->
     <div class="list-containerOther">
       <div>
-        <tabs-bar @queryOrder="query" @uploadList="upload" @showDialog="handlerDialog"  @showReturn="returnRequest" @delOrder="delRequest"/>
+        <tabs-bar ref="tabs" @queryOrder="query" @uploadList="upload" @showDialog="handlerDialog"  @showReturn="returnRequest" @delOrder="delRequest"/>
       </div>
       <list ref="list" @showDialog="handlerDialog"/>
     </div>
@@ -15,7 +15,7 @@
       :width="'70%'"
       destroy-on-close
     >
-      <info @hideDialog="hideWindow" @uploadList="upload" :oid="oid" :plas="plas" :isAdd="isAdd" :orderId="orderId" :createTime="createTime" @operation="operation"></info>
+      <info @hideDialog="hideWindow" @uploadList="onUpload" :oid="oid" :plas="plas" :isAdd="isAdd" :orderId="orderId" :createTime="createTime" :customer="customer" :customerCode="customerCode" @operation="operation"></info>
     </el-dialog>
     <el-dialog
       :visible.sync="isSh"
@@ -25,7 +25,7 @@
       :width="'70%'"
       destroy-on-close
     >
-      <returns @hideDialog="hideWindow" @uploadList="upload" :oid="oid"  :orderId="orderId" @operation="rOperation"></returns>
+      <returns @hideDialog="hideWindow" @uploadList="onUpload" :oid="oid"  :orderId="orderId" @operation="rOperation"></returns>
     </el-dialog>
   </div>
 </template>
@@ -44,21 +44,23 @@
         },
         data() {
             return {
-                visible: null,
-                isSh: null,
+              visible: null,
+              isSh: null,
               isAdd: null,
               isfullscreen: null,
               isrfullscreen: null,
-                oid: null,
-                createTime:null,
-                plas:null,
-                orderId:null,
-                treeId: null, // null
-                floorId: null
+              oid: null,
+              createTime: null,
+              plas: null,
+              orderId: null,
+              customerCode: null,
+              customer: null,
+              treeId: null, // null
+              floorId: null
             };
         },
         mounted() {
-            this.$refs.list.fetchData()
+            //this.$refs.list.fetchData()
         },
         methods: {
             hideWindow(val){
@@ -66,8 +68,7 @@
                 this.visible = val
             },
             handlerDialog(obj) {
-                console.log(obj)
-                if (obj) this.oid = obj.oid;this.plas=obj.plas;this.orderId=obj.orderId;this.createTime=obj.createTime;this.isAdd=obj.isAdd;
+                if (obj) this.oid = obj.oid;this.plas=obj.plas;this.orderId=obj.orderId;this.createTime=obj.createTime;this.isAdd=obj.isAdd;this.customerCode=obj.customerCode;this.customer=obj.customer;
                 this.visible = true
                 this.$store.dispatch("list/setClickData", '')
             },
@@ -78,7 +79,7 @@
             },
             delRequest(val){
                 this.$refs.list.delOrder(val)
-                this.$refs.list.fetchData()
+
             },
             // 查询
             query(val){
@@ -100,10 +101,12 @@
             }
           },
             // 更新列表
-            upload() {
-
-                this.$refs.list.fetchData()
-            }
+            upload(val) {
+                this.$refs.list.fetchData(val)
+            },
+          onUpload() {
+            this.$refs.list.fetchData(this.$refs.tabs.getPlaId())
+          },
         }
     };
 </script>

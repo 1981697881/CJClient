@@ -36,12 +36,12 @@ export default {
       list: {},
       type: null,
       columns: [
-          { text: "orderId", name: "orderId", default:false},
-          { text: "reOdId", name: "reOdId",default:false},
+        { text: "orderId", name: "orderId", default:false},
+        { text: "reOdId", name: "reOdId",default:false},
         { text: "退货申请日期", name: "createTime" },
         { text: "原订单单号", name: "sourceOrderNum" },
-          { text: "退货单号", name: "orderNum" },
-        {text: "购货单位", name: "customer"},
+        { text: "退货单号", name: "orderNum" },
+        { text: "购货单位", name: "customer"},
         { text: "物料代码", name: "goodCode" },
         { text: "物料名称", name: "goodName" },
         { text: "规格型号", name: "standard" },
@@ -51,9 +51,9 @@ export default {
         { text: "单价", name: "sellPrice", default:false},
         { text: "金额", name: "totalPrice", default:false},
         { text: "发货仓库", name: "plaName" },
-          { text: "退货原因", name: "reason" },
+        { text: "退货原因", name: "reason" },
         { text: "商品图片", name: "" },
-          { text: "状态", name: "isAudit" },
+        { text: "状态", name: "isAudit" },
       ]
     };
   },
@@ -68,7 +68,7 @@ export default {
     }
   }, */
   created() {
-    //判断价格权限
+    // 判断价格权限
     if(unescape(getPer('per').replace(/\\u/gi, '%u')) === '价格') {
       for(let i in this.columns) {
         if(this.columns[i].name == 'sellPrice' || this.columns[i].name == 'totalPrice') {
@@ -78,20 +78,20 @@ export default {
     }
   },
   methods: {
-    //监听每页显示几条
+    // 监听每页显示几条
     handleSize(val) {
-        this.list.size = val
-        this.fetchData();
+      this.list.size = val
+      this.fetchData();
     },
-      //监听当前页
-      handleCurrent(val) {
-          this.list.current = val;
-          this.fetchData();
+    // 监听当前页
+    handleCurrent(val) {
+      this.list.current = val;
+      this.fetchData();
     },
-      //监听单击某一行
-      rowClick(obj) {
-          this.$store.dispatch("list/setClickData", obj.row);
-      },
+    // 监听单击某一行
+    rowClick(obj) {
+      this.$store.dispatch("list/setClickData", obj.row);
+    },
     dblclick(obj) {
       if (obj.row.isAudit == '已审核') {
         obj.row.isAdd = false
@@ -99,7 +99,6 @@ export default {
       }else{
         this.$emit('showDialog',obj.row)
       }
-
     },
     fetchData(val) {
       this.loading = true;
@@ -108,12 +107,7 @@ export default {
         type: type,*/
         pageNum: this.list.current || 1,
         pageSize: this.list.size || 50
-      };
-     /* const query = {
-        query: typeof (val) == "undefined" ? '' : val.query,
-        endDate: typeof (val) == "undefined" ? '' : val.endDate,
-        startDate: typeof (val) == "undefined" ? '' : val.startDate,
-      };*/
+      }
       returnsListT(data, val).then(res => {
         this.loading = false;
         if(res.flag && res.data != null) {
@@ -127,6 +121,7 @@ export default {
               record[i].returnOrderDetailVOS[a].sourceOrderNum = record[i].sourceOrderNum
               record[i].returnOrderDetailVOS[a].isAudit = record[i].isAudit
               record[i].returnOrderDetailVOS[a].customer = record[i].customer
+              record[i].returnOrderDetailVOS[a].customerCode = record[i].customerCode
               record[i].returnOrderDetailVOS[a].plaName = record[i].plaName
               record[i].returnOrderDetailVOS[a].isAudit = record[i].isAudit
               obj.push(record[i].returnOrderDetailVOS[a])
@@ -150,9 +145,8 @@ export default {
           });
       },
   }
-};
+}
 </script>
-
 <style lang="scss" scoped>
 .list-main {
   height: calc(100vh - 300px);

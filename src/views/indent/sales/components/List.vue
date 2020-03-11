@@ -38,13 +38,12 @@
 </template>
 
 <script>
-    import {mapGetters} from "vuex";
-    import {salesList, delSaleOrder,salesListT} from "@/api/indent/sales";
-    import List from "@/components/List";
-    import {
-      getPer
-    } from '@/utils/auth'
-
+  import { mapGetters } from "vuex"
+  import {delSaleOrder, salesListT} from "@/api/indent/sales"
+  import List from "@/components/List"
+  import {
+    getPer
+  } from '@/utils/auth'
     export default {
         components: {
             List
@@ -103,6 +102,8 @@
                 const data = {
                   oid: obj.row.oid,
                   plas: obj.row.plas,
+                  customerCode: obj.row.customerCode,
+                  customer: obj.row.customer,
                   orderId: obj.row.orderNum,
                   createTime: obj.row.addTime,
                   isAdd: false
@@ -112,6 +113,8 @@
                 const data = {
                   oid: obj.row.oid,
                   plas: obj.row.plas,
+                  customerCode: obj.row.customerCode,
+                  customer: obj.row.customer,
                   orderId: obj.row.orderNum,
                   createTime: obj.row.addTime,
                 }
@@ -127,7 +130,10 @@
             delOrder(val) {
                 this.loading = true;
                 delSaleOrder(val).then(res => {
-                    this.loading = false;
+                    if(res.flag){
+                      this.loading = false;
+                      this.fetchData();
+                    }
                 });
             },
             fetchData(val) {
@@ -155,6 +161,7 @@
                             record[i].orderDetails[a].plas = record[i].plaId
                             record[i].orderDetails[a].plaName = record[i].plaName
                             record[i].orderDetails[a].customer = record[i].customer
+                            record[i].orderDetails[a].customerCode = record[i].customerCode
                             record[i].orderDetails[a].auditStatus = record[i].auditStatus
                             obj.push(record[i].orderDetails[a])
                           }

@@ -3,11 +3,10 @@
     <!--<Tree class="list-tree" @handler-node="handlerNode" />-->
     <div class="list-containerOther">
       <div>
-        <tabs-bar @queryOrder="query" @uploadList="upload"  @showDialog="handlerDialog" @delOrder="delRequest"/>
+        <tabs-bar ref="tabs" @queryOrder="query" @uploadList="upload" @showDialog="handlerDialog" @delOrder="delRequest"/>
       </div>
       <list ref="list" @showDialog="handlerDialog" @uploadList="upload"/>
     </div>
-
     <el-dialog
       :fullscreen="isfullscreen"
       :visible.sync="visible"
@@ -16,74 +15,79 @@
       :width="'70%'"
       destroy-on-close
     >
-      <returns @hideDialog="hideWindow" @uploadList="upload" :isAdd="isAdd" :reOdId="reOdId" :img="img" @operation="operation"></returns>
-
+      <returns @hideDialog="hideWindow" @uploadList="onUpload" :isAdd="isAdd" :reOdId="reOdId" :img="img" :customer="customer" :customerCode="customerCode" @operation="operation"></returns>
     </el-dialog>
   </div>
 </template>
-
 <script>
-    import {TabsBar, List} from "./components";
-    import {Returns} from "./form";
-    export default {
-        components: {
-            TabsBar,
-            List,
-            Returns
-        },
-        data() {
-            return {
-                visible: null,
-                fid: null,
-                reOdId: null,
-              isAdd:null,
-                isfullscreen: null,
-                img:null,
-                orderId: null,
-                treeId: null, // null
-                floorId: null
-            };
-        },
-        mounted() {
-            this.$refs.list.fetchData()
-        },
-        methods: {
-            hideWindow(val) {
-                this.visible = val
-            },
-            handlerDialog(obj) {
-              console.log(obj)
-                if (obj) this.reOdId = obj.reId; this.img = obj.image;this.isAdd = obj.isAdd
-                this.visible = true
-              this.$store.dispatch("list/setClickData", '')
-            },
-            handlerNode(node) {
-                console.log(node.data)
-                this.$refs.list.fetchData(node.data.fid, node.data.type)
-            },
-            delRequest(val){
-                this.$refs.list.delOrder(val);
-                this.$refs.list.fetchData()
-            },
-          //查询
-          query(val){
-            this.$refs.list.fetchData(val)
-          },
-          //操作窗口
-          operation(val) {
-            if(val == 1) {
-              this.isfullscreen = true
-            }else {
-              this.isfullscreen = false
-            }
-          },
-            //更新列表
-            upload(){
-                this.$refs.list.fetchData()
-            }
-        }
-    };
-</script>
+  import {TabsBar, List} from "./components";
+  import {Returns} from "./form";
 
+  export default {
+    components: {
+      TabsBar,
+      List,
+      Returns
+    },
+    data() {
+      return {
+        visible: null,
+        fid: null,
+        reOdId: null,
+        isAdd: null,
+        isfullscreen: null,
+        img: null,
+        customerCode: null,
+        customer: null,
+        orderId: null,
+        treeId: null, // null
+        floorId: null
+      };
+    },
+    mounted() {
+      //this.$refs.list.fetchData()
+    },
+    methods: {
+      hideWindow(val) {
+        this.visible = val
+      },
+      handlerDialog(obj) {
+        if (obj) this.reOdId = obj.reId;
+        this.img = obj.image;
+        this.isAdd = obj.isAdd;
+        this.customerCode = obj.customerCode;
+        this.customer = obj.customer
+        this.visible = true
+        this.$store.dispatch("list/setClickData", '')
+      },
+      handlerNode(node) {
+        this.$refs.list.fetchData(node.data.fid, node.data.type)
+      },
+      delRequest(val) {
+        this.$refs.list.delOrder(val);
+        this.$refs.list.fetchData()
+      },
+      //查询
+      query(val) {
+        this.$refs.list.fetchData(val)
+      },
+      //操作窗口
+      operation(val) {
+        if (val == 1) {
+          this.isfullscreen = true
+        } else {
+          this.isfullscreen = false
+        }
+      },
+      //更新列表
+      upload(val) {
+        this.$refs.list.fetchData(val)
+      },
+      onUpload() {
+        this.$refs.list.fetchData(this.$refs.tabs.getPlaId())
+      },
+    }
+  }
+</script>
 <style lang="scss" scoped>
 </style>

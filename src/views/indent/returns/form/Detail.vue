@@ -19,10 +19,21 @@
             <el-input v-model="form.orderId"></el-input>
           </el-form-item>
         </el-col>
-
         <el-col :span="2">
           <el-button :size="'mini'" type="success" icon="el-icon-search" @click="queryOrder" :disabled="disabled">查询
           </el-button>
+        </el-col>
+      </el-row>
+      <el-row :gutter="20">
+        <el-col :span="12">
+          <el-form-item :label="'退货人名称'">
+            <el-input v-model="form.name" :disabled="true"></el-input>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item :label="'退货人编码'" >
+            <el-input v-model="form.username" :disabled="true"></el-input>
+          </el-form-item>
         </el-col>
       </el-row>
       <el-row :gutter="20">
@@ -143,10 +154,10 @@
   import {
     getPer
   } from '@/utils/auth'
-
   import {getSaleOrder} from "@/api/indent/sales";
   import {saveReturn, getReturnOrder, alterReturn, uploadImgs, getOrderGoodsById} from "@/api/indent/returns";
   import List from "@/components/List";
+  import {getInfo} from '@/api/user'
 
   export default {
     components: {
@@ -166,6 +177,14 @@
         default: null
       },
       img: {
+        type: String,
+        default: null
+      },
+      customer: {
+        type: String,
+        default: null
+      },
+      customerCode: {
         type: String,
         default: null
       },
@@ -201,7 +220,8 @@
           reOdId: null,
           orderId: null,
           name: null, // 客户名称
-          reason: null, // 客户编号
+          username: null, // 客户编号
+          reason: null,
         },
         rules: {
           reason: [
@@ -274,12 +294,16 @@
       //this.tableData();
       //订单页面进入
       if (typeof (this.orderId) != undefined && this.orderId != null) {
-        this.tableData(this.form.orderId);
+        this.getUserInfo()
+        this.tableData(this.form.orderId)
       }
       //退货修改
       if (typeof (this.reOdId) != undefined && this.reOdId != null) {
-
-        this.fetchData(this.form.reOdId);
+        this.form.name = this.customer
+        this.form.username = this.customerCode
+        this.fetchData(this.form.reOdId)
+      } else {
+        this.getUserInfo()
       }
     },
     methods: {
@@ -509,6 +533,7 @@
       tableData(orderNum) {
         getSaleOrder(orderNum).then(res => {
           this.list = res.data
+          this.form.oid = res.data[0]['oid']
         })
       },
       rightTable(val) {
@@ -529,6 +554,14 @@
           }
         })
       },
+      getUserInfo() {
+        getInfo().then(res => {
+          if (res.flag) {
+            this.form.name = res.data["name"]
+            this.form.username = res.data["username"]
+          }
+        })
+      }
     }
   };
 </script>

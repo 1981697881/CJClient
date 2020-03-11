@@ -1,8 +1,8 @@
 <template>
   <div class="list-header">
-    <el-form v-model="search" :size="'mini'" :label-width="'80px'">
+    <el-form v-model="search" :size="'mini'" :label-width="'60px'">
       <el-row :gutter="12">
-        <el-col :span="7">
+        <el-col :span="6.5">
           <el-form-item :label="'日期'">
             <el-date-picker
               v-model="value"
@@ -17,12 +17,24 @@
           </el-form-item>
         </el-col>
         <el-col :span="3">
-          <el-form-item :label="'单号'">
+          <el-form-item :label="'关键字'">
             <el-input v-model="search.keyword" placeholder="输入关键字查询"/>
           </el-form-item>
         </el-col>
         <el-col :span="2">
           <el-button :size="'mini'" type="success" icon="el-icon-search" @click="query">查询</el-button>
+        </el-col>
+        <el-col :span="3">
+          <el-form-item :label="'平台'" prop="plaIdS">
+            <el-select v-model="plaIdS"  placeholder="请选择" @change="selectChange">
+              <el-option
+                v-for="(t,i) in plaArray2"
+                :key="i"
+                :label="t.platformName"
+                :value="t.plaId">
+              </el-option>
+            </el-select>
+          </el-form-item>
         </el-col>
         <el-col :span="1">
           <el-upload
@@ -63,9 +75,7 @@
       destroy-on-close
     >
       <div style="text-align: center" >
-        <el-radio v-model="plas"  border size="medium" v-for="t in plaArray"
-                  :label="t.plaId"
-                >{{t.platformName}}</el-radio>
+        <el-radio v-model="plas"  border size="medium" v-for="t in plaArray" :label="t.plaId">{{t.platformName}}</el-radio>
       </div>
       <div slot="footer" style="text-align:center;padding-top:15px;">
         <el-button type="success" @click="handleAdd">确定</el-button>
@@ -73,21 +83,17 @@
     </el-dialog>
   </div>
 </template>
-
 <script>
-    import { mapGetters } from "vuex"
-    import {getPlas, exportData} from "@/api/indent/sales"
-    import {
-        getToken
-    } from '@/utils/auth'
+  import { mapGetters } from 'vuex'
+  import {getPlas, exportData} from "@/api/indent/sales"
+  import {getToken} from '@/utils/auth'
+  export default {
+    components: {},
+    computed: {
+      ...mapGetters(["node", "clickData", "selections"])
 
-    export default {
-        components: {},
-        computed: {
-            ...mapGetters(["node", "clickData", "selections"])
-
-        },
-        data() {
+    },
+    data() {
             return {
                 headers: {
                     'authorization': getToken('rx'),
@@ -97,6 +103,8 @@
                 },
                 plas: null,
                 plaArray:[],
+              plaIdS: null,
+              plaArray2:[],
                 visible: false,
                 isUpload:null,
                 search: {
@@ -132,7 +140,25 @@
                 value: ''
             };
         },
+    mounted() {
+      this.fetchFormat();
+    },
         methods: {
+          getPlaId() {
+            return {plaId: this.plaIdS}
+          },
+          fetchFormat() {
+            getPlas().then(res => {
+              if(res.flag) {
+                this.$emit('uploadList', {plaId: res.data[0].plaId})
+                this.plaArray2 = res.data
+                this.plaIdS = res.data[0].plaId
+              }
+            });
+          },
+          selectChange(val) {
+            this.$emit('queryOrder', {plaId: val, query: this.search.keyword })
+          },
             handleCreate() {
                 this.isUpload = false
                 getPlas().then(res => {
@@ -151,25 +177,25 @@
                         this.plaArray = res.data;
                         this.plas = res.data[0].plaId;
                     });
-                    //this.visible = true;
+                    this.visible = true
                 }
 
             },
-            submitUpload(){
-                this.$refs.upload.submit();
-                //this.visible = false;
+            submitUpload() {
+                this.$refs.upload.submit()
+                this.visible = false
             },
             handleAdd() {
                 if(this.isUpload){
                     this.fileData.plaId = this.plas
                     this.submitUpload()
-                    this.visible = false;
+                    this.visible = false
                 }else{
                     this.$emit('showDialog', {
                         oid: null,
                         plas: this.plas
                     })
-                    this.visible = false;
+                    this.visible = false
                 }
 
             },
@@ -196,11 +222,9 @@
                         type: "warning"
                     });
                 }
-
-
             },
           upload() {
-            this.$emit('uploadList')
+            this.$emit('uploadList', {plaId: this.plaIdS})
             this.search.keyword = ''
             this.value = ''
           },
@@ -213,6 +237,7 @@
             this.search.keyword != null || this.search.keyword != undefined ? obj.query = this.search.keyword : null
             this.value[1] != null || this.value[1] != undefined ? obj.endDate = this.value[1] : null
             this.value[0] != null || this.value[0] != undefined ? obj.startDate = this.value[0] : null
+            obj.plaId = this.plaIdS
             return obj
           },
           // 下载文件
@@ -249,7 +274,14 @@
             },
             delSaleOrder() {
                 if (this.clickData.oid) {
+                  if(this.clickData.auditStatus == '未审核') {
                     this.$emit('delOrder', this.clickData.oid)
+                  } else {
+                    this.$message({
+                      message: "订单已审核",
+                      type: "warning"
+                    })
+                  }
                 } else {
                     this.$message({
                         message: "无选中行",
@@ -263,6 +295,8 @@
                     this.$emit('showDialog', {
                       oid: this.clickData.oid,
                       plas: this.clickData.plas,
+                      customerCode: obj.row.customerCode,
+                      customer: obj.row.customer,
                       orderId: this.clickData.orderNum,
                       createTime: this.clickData.addTime,
                       isAdd: false
@@ -272,6 +306,8 @@
                     this.$emit('showDialog', {
                       oid: this.clickData.oid,
                       plas: this.clickData.plas,
+                      customerCode: obj.row.customerCode,
+                      customer: obj.row.customer,
                       orderId: this.clickData.orderNum,
                       createTime: this.clickData.addTime
                     })
@@ -285,8 +321,7 @@
 
             },
         }
-    };
+    }
 </script>
-
 <style>
 </style>
