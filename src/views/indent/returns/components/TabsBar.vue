@@ -39,6 +39,7 @@
         <el-button-group style="float:right">
           <el-button :size="'mini'" type="primary" icon="el-icon-plus" @click.native="handleCreate">新增</el-button>
           <el-button :size="'mini'" type="primary" icon="el-icon-edit" @click.native="handleAlter">修改</el-button>
+          <el-button :size="'mini'" type="primary" icon="el-icon-check" @click.native="handleConfirm">单据确认</el-button>
           <el-button :size="'mini'" type="primary" icon="el-icon-download" @click="exportOrder">导出</el-button>
           <el-button :size="'mini'" type="primary" icon="el-icon-refresh" @click.native="upload">刷新</el-button>
           <el-button :size="'mini'" type="warning" icon="el-icon-delete" @click="delReturnOrder">删除</el-button>
@@ -122,20 +123,29 @@
       },
       delReturnOrder() {
         if (this.clickData.reId) {
-          console.log(this.clickData.isAudit)
-          if(this.clickData.isAudit == '未审核') {
-            this.$emit('delOrder', this.clickData.reId)
-          } else {
+          //if(this.clickData.isAudit == '未审核') {
+            this.$emit('delOrder', this.clickData)
+         /* } else {
             this.$message({
               message: "该单已审核",
               type: "warning"
             })
-          }
+          }*/
         } else {
           this.$message({
             message: "无选中行",
             type: "warning"
           });
+        }
+      },
+      handleConfirm() {
+        if (this.clickData.reId) {
+          this.$emit('confirm', this.clickData.reId)
+        } else {
+          this.$message({
+            message: "无选中行",
+            type: "warning"
+          })
         }
       },
       upload() {
@@ -176,7 +186,7 @@
       },
       handleAlter() {
         if (this.clickData.reId) {
-          if (this.clickData.isAudit == '已审核') {
+          if (this.clickData.isAudit == '已审核' || this.clickData.isAudit == '已驳回') {
             this.clickData.isAdd = false
             this.$emit('showDialog', this.clickData)
           } else {

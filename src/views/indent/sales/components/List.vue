@@ -39,11 +39,9 @@
 
 <script>
   import { mapGetters } from "vuex"
-  import {delSaleOrder, salesListT} from "@/api/indent/sales"
+  import {delSaleOrder, salesListT, confirmSaleOrder} from "@/api/indent/sales"
   import List from "@/components/List"
-  import {
-    getPer
-  } from '@/utils/auth'
+  import {getPer} from '@/utils/auth'
     export default {
         components: {
             List
@@ -72,7 +70,7 @@
                   {text: "发货仓库", name: "plaName"},
                   {text: "商品图片", name: "img"},
                     {text: "审核状态", name: "auditStatus"},
-                    //{text: "状态", name: "status"},
+                    {text: "状态", name: "status"},
                 ]
             };
         },
@@ -98,7 +96,7 @@
                 this.fetchData();
             },
             dblclick(obj) {
-              if(obj.row.auditStatus == '已审核'){
+              if(obj.row.auditStatus == '已审核' || obj.row.auditStatus == '已驳回'){
                 const data = {
                   oid: obj.row.oid,
                   plas: obj.row.plas,
@@ -127,15 +125,39 @@
             rowClick(obj) {
                 this.$store.dispatch("list/setClickData", obj.row);
             },
+          open(val) {
+            this.$confirm('是否删除' + val.orderNum + '整张单据，删除后将无法恢复?', '提示', {
+              confirmButtonText: '确定',
+              cancelButtonText: '取消',
+              type: 'warning'
+            }).then(() => {
+              this.loading = true;
+              console.log(val.oid)
+              delSaleOrder(val.oid).then(res => {
+                this.loading = false;
+                if(res.flag){
+                  this.fetchData({plaId: val.plaId});
+                }
+              });
+            }).catch(() => {
+              this.$message({
+                type: 'info',
+                message: '已取消删除'
+              });
+            });
+          },
             delOrder(val) {
-                this.loading = true;
-                delSaleOrder(val).then(res => {
-                    if(res.flag){
-                      this.loading = false;
-                      this.fetchData();
-                    }
-                });
+              this.open(val)
             },
+          confirmOrder(val, id) {
+            this.loading = true
+            confirmSaleOrder(val).then(res => {
+              this.loading = false
+              if(res.flag) {
+                this.fetchData(id)
+              }
+            });
+          },
             fetchData(val) {
                 this.loading = true
                 const data = {
@@ -163,6 +185,7 @@
                             record[i].orderDetails[a].customer = record[i].customer
                             record[i].orderDetails[a].customerCode = record[i].customerCode
                             record[i].orderDetails[a].auditStatus = record[i].auditStatus
+                            record[i].orderDetails[a].status = record[i].status
                             obj.push(record[i].orderDetails[a])
                           }
                         }

@@ -48,7 +48,7 @@
           <el-upload
             action="web/file/returnOrder/imgUpload"
             list-type="picture-card"
-            accept="png,jpg,jpeg"
+            accept="image/jpeg,image/jpg,image/png,image/gif"
             :headers="headers"
             :data="imgData"
             :limit="5"
@@ -279,7 +279,7 @@
             this.images.push(imgArray[i].split('/web/returnOrder/img/')[1])
             //展示已有图片到窗口
             this.fileList.push({
-              url: 'http://120.78.168.141:8090/web' + imgArray[i],
+              url: 'http://test.gzfzdev.com:8080/web' + imgArray[i],
               name: imgArray[i].split('/web/returnOrder/img/')[1]
             })
           }
@@ -351,7 +351,6 @@
       saveNum() {
         if (this.num1 > 0) {
           this.$set(this.obj, 'num', this.num1);
-
           this.$set(this.obj, 'siId', this.obj.siId);
           this.$set(this.obj, 'gid', this.obj.gid);
           var tList = this.tList,
@@ -388,6 +387,7 @@
       },
       //上传失败事件
       uploadError(res) {
+        console.log(res)
         this.$message({
           message: res.msg,
           type: "warning"
@@ -484,36 +484,53 @@
               }
               //判断修改或新增
               if (typeof (this.reOdId) != undefined && this.reOdId != null) {
-                obj.order = {
-                  orderId: this.form.oid,
-                  reason: this.form.reason,
-                  reOdId: this.form.reOdId,
-                  img: this.images.join(',')
-                }
-                obj.returnOrders = array
-                alterReturn(obj).then(res => {
-                  if (res.flag) {
-                    this.$emit('hideDialog', false)
-                    this.$emit('uploadList')
-                    //批量上傳
-                    //this.submitUpload()
+                // 判断是否有图片
+                if(this.images.length > 0) {
+                  obj.order = {
+                    orderId: this.form.oid,
+                    reason: this.form.reason,
+                    reOdId: this.form.reOdId,
+                    img: this.images.join(',')
                   }
-                });
+                  obj.returnOrders = array
+                  alterReturn(obj).then(res => {
+                    if (res.flag) {
+                      this.$emit('hideDialog', false)
+                      this.$emit('uploadList')
+                      //批量上傳
+                      //this.submitUpload()
+                    }
+                  })
+                } else {
+                  return this.$message({
+                    message: "请上传退货图片",
+                    type: "warning"
+                  })
+                }
               } else {
-                obj.order = {
-                  orderId: this.form.oid,
-                  reason: this.form.reason,
-                  img: this.images.join(',')
-                }
-                obj.returnOrders = array
-                saveReturn(obj).then(res => {
-                  if (res.flag) {
-                    this.$emit('uploadList')
-                    this.$emit('hideDialog', false)
-                    //批量上傳
-                    //this.submitUpload(res.data['reOdId'])
+                // 判断是否有图片
+                if(this.images.length > 0) {
+                  obj.order = {
+                    orderId: this.form.oid,
+                    reason: this.form.reason,
+                    img: this.images.join(',')
                   }
-                })
+                  obj.returnOrders = array
+                  saveReturn(obj).then(res => {
+                    if (res.flag) {
+                      this.$emit('uploadList')
+                      this.$emit('hideDialog', false)
+                      //批量上傳
+                      //this.submitUpload(res.data['reOdId'])
+                    }
+                  })
+                } else {
+                  return this.$message({
+                    message: "请上传退货图片",
+                    type: "warning"
+                  })
+                }
+
               }
             } else {
               return this.$message({

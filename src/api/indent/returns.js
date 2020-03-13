@@ -66,6 +66,17 @@ export function delReturnOrder(data) {
     method: 'delete',
   })
 }
+// 确定订单
+export function confirmReturnOrder(data) {
+  const url = '/returnOrder/confirm/' + data
+  return request({
+    headers: {
+      'authorization': getToken('rx')
+    },
+    url: url,
+    method: 'post'
+  })
+}
 // 修改 根据id查询
 export function getReturnOrder(data) {
   const url = '/returnOrder/getById/' + data

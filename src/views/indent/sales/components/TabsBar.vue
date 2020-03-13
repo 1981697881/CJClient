@@ -60,6 +60,7 @@
         <el-button-group style="float:right">
           <el-button :size="'mini'" type="primary" icon="el-icon-plus" @click.native="handleCreate">新增</el-button>
           <el-button :size="'mini'" type="primary" icon="el-icon-edit" @click.native="handleAlter">修改</el-button>
+          <el-button :size="'mini'" type="primary" icon="el-icon-check" @click.native="handleConfirm">单据确认</el-button>
           <el-button :size="'mini'" type="warning" icon="el-icon-delete" @click.native="delSaleOrder">删除</el-button>
           <el-button :size="'mini'" type="primary" icon="el-icon-refresh" @click.native="upload">刷新</el-button>
           <el-button :size="'mini'" type="primary" icon="el-icon-download" @click="exportOrder">导出</el-button>
@@ -274,14 +275,14 @@
             },
             delSaleOrder() {
                 if (this.clickData.oid) {
-                  if(this.clickData.auditStatus == '未审核') {
-                    this.$emit('delOrder', this.clickData.oid)
-                  } else {
+                  //if(this.clickData.auditStatus == '未审核') {
+                    this.$emit('delOrder', this.clickData)
+                 /* } else {
                     this.$message({
                       message: "订单已审核",
                       type: "warning"
                     })
-                  }
+                  }*/
                 } else {
                     this.$message({
                         message: "无选中行",
@@ -289,25 +290,34 @@
                     });
                 }
             },
+          handleConfirm() {
+            if (this.clickData.oid) {
+              this.$emit('confirm',  this.clickData.oid)
+            } else {
+              this.$message({
+                message: "无选中行",
+                type: "warning"
+              });
+            }
+          },
             handleAlter() {
                 if (this.clickData.oid) {
-                  if(this.clickData.auditStatus == '已审核') {
+                  if (this.clickData.auditStatus == '已审核' || this.clickData.auditStatus == '已驳回') {
                     this.$emit('showDialog', {
                       oid: this.clickData.oid,
                       plas: this.clickData.plas,
-                      customerCode: obj.row.customerCode,
-                      customer: obj.row.customer,
+                      customerCode: this.clickData.customerCode,
+                      customer: this.clickData.customer,
                       orderId: this.clickData.orderNum,
                       createTime: this.clickData.addTime,
                       isAdd: false
                     })
-
                   } else {
                     this.$emit('showDialog', {
                       oid: this.clickData.oid,
                       plas: this.clickData.plas,
-                      customerCode: obj.row.customerCode,
-                      customer: obj.row.customer,
+                      customerCode: this.clickData.customerCode,
+                      customer: this.clickData.customer,
                       orderId: this.clickData.orderNum,
                       createTime: this.clickData.addTime
                     })

@@ -3,7 +3,7 @@
     <!--<Tree class="list-tree" @handler-node="handlerNode" />-->
     <div class="list-containerOther">
       <div>
-        <tabs-bar ref="tabs" @queryOrder="query" @uploadList="upload" @showDialog="handlerDialog" @delOrder="delRequest"/>
+        <tabs-bar ref="tabs" @queryOrder="query" @confirm="confirm" @uploadList="upload" @showDialog="handlerDialog" @delOrder="delRequest"/>
       </div>
       <list ref="list" @showDialog="handlerDialog" @uploadList="upload"/>
     </div>
@@ -64,8 +64,10 @@
         this.$refs.list.fetchData(node.data.fid, node.data.type)
       },
       delRequest(val) {
-        this.$refs.list.delOrder(val);
-        this.$refs.list.fetchData()
+        this.$refs.list.delOrder({reId: val.reId, orderNum: val.orderNum, plaId: this.$refs.tabs.getPlaId()});
+      },
+      confirm(val) {
+        this.$refs.list.confirmOrder(val, this.$refs.tabs.getPlaId());
       },
       //查询
       query(val) {

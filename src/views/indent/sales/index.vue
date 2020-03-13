@@ -3,7 +3,7 @@
     <!--<Tree class="list-tree" @handler-node="handlerNode" />-->
     <div class="list-containerOther">
       <div>
-        <tabs-bar ref="tabs" @queryOrder="query" @uploadList="upload" @showDialog="handlerDialog"  @showReturn="returnRequest" @delOrder="delRequest"/>
+        <tabs-bar ref="tabs" @queryOrder="query" @uploadList="upload" @confirm="confirm" @showDialog="handlerDialog"  @showReturn="returnRequest" @delOrder="delRequest"/>
       </div>
       <list ref="list" @showDialog="handlerDialog"/>
     </div>
@@ -77,12 +77,14 @@
                 this.isSh = true
                 this.$store.dispatch("list/setClickData", '')
             },
-            delRequest(val){
-                this.$refs.list.delOrder(val)
-
+            delRequest(val) {
+                this.$refs.list.delOrder({oid: val.oid, orderNum: val.orderNum, plaId: this.$refs.tabs.getPlaId()})
             },
+          confirm(val) {
+            this.$refs.list.confirmOrder(val, this.$refs.tabs.getPlaId())
+          },
             // 查询
-            query(val){
+            query(val) {
                 this.$refs.list.fetchData(val)
             },
           // 操作窗口

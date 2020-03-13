@@ -17,7 +17,7 @@
 
 <script>
 import { mapGetters } from "vuex";
-import { returnsList, delReturnOrder, returnsListT} from "@/api/indent/returns";
+import { returnsList, delReturnOrder, returnsListT, confirmReturnOrder} from "@/api/indent/returns";
 import List from "@/components/List";
 import {
   getPer
@@ -53,7 +53,8 @@ export default {
         { text: "发货仓库", name: "plaName" },
         { text: "退货原因", name: "reason" },
         { text: "商品图片", name: "" },
-        { text: "状态", name: "isAudit" },
+        { text: "审核状态", name: "isAudit" },
+        { text: "状态", name: "status" },
       ]
     };
   },
@@ -93,7 +94,7 @@ export default {
       this.$store.dispatch("list/setClickData", obj.row);
     },
     dblclick(obj) {
-      if (obj.row.isAudit == '已审核') {
+      if (obj.row.isAudit == '已审核' || obj.row.isAudit == '已驳回') {
         obj.row.isAdd = false
         this.$emit('showDialog',obj.row)
       }else{
@@ -124,6 +125,7 @@ export default {
               record[i].returnOrderDetailVOS[a].customerCode = record[i].customerCode
               record[i].returnOrderDetailVOS[a].plaName = record[i].plaName
               record[i].returnOrderDetailVOS[a].isAudit = record[i].isAudit
+              record[i].returnOrderDetailVOS[a].status = record[i].status
               obj.push(record[i].returnOrderDetailVOS[a])
             }
           }
@@ -138,12 +140,39 @@ export default {
         }
       });
     },
-      delOrder(val){
-          this.loading = true;
-          delReturnOrder(val).then(res => {
-              this.loading = false;
-          });
-      },
+    open(val) {
+      this.$confirm('是否删除' + val.orderNum + '整张单据，删除后将无法恢复?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.loading = true;
+        console.log(val.reId)
+        delReturnOrder(val.reId).then(res => {
+          this.loading = false;
+          if(res.flag){
+            this.fetchData({plaId: val.plaId});
+          }
+        });
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        });
+      });
+    },
+    delOrder(val) {
+     this.open(val)
+    },
+    confirmOrder(val, id) {
+      this.loading = true
+      confirmReturnOrder(val).then(res => {
+        this.loading = false
+        if(res.flag) {
+          this.fetchData(id)
+        }
+      });
+    },
   }
 }
 </script>

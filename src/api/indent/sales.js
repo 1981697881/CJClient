@@ -122,6 +122,17 @@ export function delSaleOrder(data) {
     method: 'delete',
   })
 }
+// 删除订单
+export function confirmSaleOrder(data) {
+  const url = '/order/confirm/' + data
+  return request({
+    headers: {
+      'authorization': getToken('rx')
+    },
+    url: url,
+    method: 'post',
+  })
+}
 // 导出待选区订单
 export function exportorder(data) {
   const url = '/excel/export/order'
