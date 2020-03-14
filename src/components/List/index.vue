@@ -5,6 +5,7 @@
       border
       stripe
       size="mini"
+
       :highlight-current-row="true"
       @row-dblclick="dblclick"
       @row-click="rowClick"

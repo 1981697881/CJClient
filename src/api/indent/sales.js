@@ -122,7 +122,7 @@ export function delSaleOrder(data) {
     method: 'delete',
   })
 }
-// 删除订单
+// 确认订单
 export function confirmSaleOrder(data) {
   const url = '/order/confirm/' + data
   return request({

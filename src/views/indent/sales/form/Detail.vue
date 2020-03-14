@@ -55,6 +55,13 @@
         </el-col>
       </el-row>
       <el-row :gutter="20">
+        <el-col :span="24">
+          <el-form-item :label="'备注'">
+            <el-input v-model="form.remark"></el-input>
+          </el-form-item>
+        </el-col>
+      </el-row>
+      <el-row :gutter="20">
         <el-col :span="12">
           <el-table class="list-main" :height="'250px'" :data="list"  border size="mini"  :highlight-current-row="true" @selection-change="handleSelectionChange">
             <el-table-column
@@ -218,6 +225,10 @@
         type: String,
         default: null
       },
+      remark: {
+        type: String,
+        default: null
+      },
       createTime: {
         type: String,
         default: null
@@ -241,6 +252,7 @@
           goods: null,
           warehouse: null,
           fid: null,
+          remark: null,
           orderId: null,
           createTime: null,
           name: null, // 客户名称
@@ -317,6 +329,7 @@
         this.form.name = this.customer
         this.form.username = this.customerCode
         this.form.orderId = this.orderId
+        this.form.remark = this.remark
         this.form.createTime = this.createTime
         this.tableData(this.oid);
       } else {
@@ -499,13 +512,15 @@
               }
               if (typeof (this.oid) != undefined && this.oid != null) {
                 obj.oid = this.oid
+                obj.remark = this.form.remark
                 obj.orderGoods = array
                 updateSale(obj).then(res => {
                   this.$emit('hideDialog', false)
                   this.$emit('uploadList')
                 });
               } else {
-                obj.orderGoods = array;
+                obj.orderGoods = array
+                obj.remark = this.form.remark
                 saveSale(obj).then(res => {
                   this.$emit('hideDialog', false)
                   this.$emit('uploadList')
@@ -534,11 +549,11 @@
           //判断图片是否为空
           this.tpvisible = true;
           if (this.fileList.length > 0) {
-            this.fileList[0].url = 'http://test.gzfzdev.com:8080/web' + imgArray[0];
+            this.fileList[0].url = 'http://120.78.168.141:8090/web' + imgArray[0];
           } else {
             this.fileList = []
             this.fileList.push({
-              url: 'http://test.gzfzdev.com:8080/web' + imgArray[0]
+              url: 'http://120.78.168.141:8090/web' + imgArray[0]
             })
           }
         } else {

@@ -15,7 +15,7 @@
       :width="'70%'"
       destroy-on-close
     >
-      <info @hideDialog="hideWindow" @uploadList="onUpload" :oid="oid" :plas="plas" :isAdd="isAdd" :orderId="orderId" :createTime="createTime" :customer="customer" :customerCode="customerCode" @operation="operation"></info>
+      <info @hideDialog="hideWindow" @uploadList="onUpload" :oid="oid" :plas="plas" :isAdd="isAdd" :orderId="orderId" :createTime="createTime" :customer="customer" :customerCode="customerCode" :remark="remark" @operation="operation"></info>
     </el-dialog>
     <el-dialog
       :visible.sync="isSh"
@@ -52,6 +52,7 @@
               oid: null,
               createTime: null,
               plas: null,
+              remark: null,
               orderId: null,
               customerCode: null,
               customer: null,
@@ -68,7 +69,7 @@
                 this.visible = val
             },
             handlerDialog(obj) {
-                if (obj) this.oid = obj.oid;this.plas=obj.plas;this.orderId=obj.orderId;this.createTime=obj.createTime;this.isAdd=obj.isAdd;this.customerCode=obj.customerCode;this.customer=obj.customer;
+                if (obj) this.oid = obj.oid;this.plas=obj.plas;this.orderId=obj.orderId;this.createTime=obj.createTime;this.isAdd=obj.isAdd;this.customerCode=obj.customerCode;this.customer = obj.customer; this.remark = obj.remark
                 this.visible = true
                 this.$store.dispatch("list/setClickData", '')
             },

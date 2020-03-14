@@ -310,6 +310,7 @@
                       customer: this.clickData.customer,
                       orderId: this.clickData.orderNum,
                       createTime: this.clickData.addTime,
+                      remark: this.clickData.remark,
                       isAdd: false
                     })
                   } else {
@@ -319,7 +320,8 @@
                       customerCode: this.clickData.customerCode,
                       customer: this.clickData.customer,
                       orderId: this.clickData.orderNum,
-                      createTime: this.clickData.addTime
+                      createTime: this.clickData.addTime,
+                      remark: this.clickData.remark
                     })
                   }
                 } else {
