@@ -7,7 +7,7 @@ export function getPlas(data) {
   const url = '/Admin/pla/list'
   return request({
     headers: {
-      'authorization': getToken('rx')
+      'authorization': getToken('clrx')
     },
     url: url,
     method: 'get'
@@ -31,7 +31,7 @@ export function getInfo(fid) {
   return request({
     url: '/user/getUserInfo',
     headers: {
-      'authorization': getToken('rx'),
+      'authorization': getToken('clrx'),
       'Content-Type': 'application/json'
     },
     method: 'put',
@@ -42,7 +42,7 @@ export function getPermissions() {
   return request({
     url: '/cjsh-permission/getPermissions',
     headers: {
-      'authorization': getToken('rx'),
+      'authorization': getToken('clrx'),
     },
     method: 'get',
   })
@@ -58,7 +58,7 @@ export function changePassword(data) {
   return request({
     headers: {
       'Content-Type': 'application/json',
-      'authorization': getToken('rx'),
+      'authorization': getToken('clrx'),
     },
     url: '/user/changePassword',
     method: 'put',

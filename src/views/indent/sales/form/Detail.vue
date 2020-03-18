@@ -307,7 +307,7 @@
     },
     created() {
       //判断价格权限
-      if(unescape(getPer('per').replace(/\\u/gi, '%u')) === '价格') {
+      if(unescape(getPer('clper').replace(/\\u/gi, '%u')) === '价格') {
         for(let i in this.columns) {
           if(this.columns[i].name == 'price') {
             this.columns[i].default = true

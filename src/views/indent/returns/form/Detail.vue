@@ -196,7 +196,7 @@
     data() {
       return {
         headers: {
-          'authorization': getToken('rx'),
+          'authorization': getToken('clrx'),
         },
         biggest: true,
         normal: false,
@@ -240,7 +240,8 @@
           {text: "计量单位", name: "unitOfMea"},
           {text: "单价", name: "sellPrice", default:false},
           {text: "仓库", name: "wareHouseName"},
-          {text: "数量", name: "num"},
+          //{text: "数量", name: "num"},
+          {text: "数量", name: "actualNum"},
         ],
         columns2: [
           {text: "gid", name: "gid", default: false},
@@ -252,7 +253,7 @@
     },
     created() {
       //判断价格权限
-      if(unescape(getPer('per').replace(/\\u/gi, '%u')) === '价格') {
+      if(unescape(getPer('clper').replace(/\\u/gi, '%u')) === '价格') {
         for(let i in this.columns1) {
           if(this.columns1[i].name == 'sellPrice') {
             this.columns1[i].default = true
@@ -329,7 +330,7 @@
         this.formDate.append('ro_id', val);
         let config = {
           headers: {
-            'authorization': getToken('rx'),
+            'authorization': getToken('clrx'),
             'Content-Type': 'multipart/form-data'
           }
         }
@@ -350,17 +351,17 @@
       //添加数量->待确认区
       saveNum() {
         if (this.num1 > 0) {
-          this.$set(this.obj, 'num', this.num1);
-          this.$set(this.obj, 'siId', this.obj.siId);
-          this.$set(this.obj, 'gid', this.obj.gid);
+          this.$set(this.obj, 'num', this.num1)
+          this.$set(this.obj, 'siId', this.obj.siId)
+          this.$set(this.obj, 'gid', this.obj.gid)
           var tList = this.tList,
             number = 0,
             obj = this.obj;
           //判断添加到待确认的数据是否重复
           for (var i in tList) {
             //判断id是否== 是数量加 否添加添加一行
+            console.log(obj['num'] +","+ tList[i]['num'])
             if (obj['siId'] == tList[i]['siId']) {
-              console.log(parseFloat(tList[i].num) + parseFloat(obj['num']))
               this.$set(tList, i, {
                 ...tList[i],
                 num: parseFloat(tList[i].num) + parseFloat(obj['num'])
@@ -369,6 +370,7 @@
               break;
             }
           }
+          console.log(tList)
           //false
           if (number == 0) {
             //查询窗口插入数据
@@ -454,16 +456,17 @@
       handleAdd(val) {
         this.obj = JSON.parse(JSON.stringify(val))
         this.visible = true
-        var list = this.tList;
-        if (list.length == 0) {
-          this.max = this.obj['num']
-        } else {
-          //控制数量输入最大限度
-          for (var i in list) {
-            if (list[i]['siId'] == this.obj['siId']) {
-              this.max = parseInt(this.obj['num']) - parseInt(list[i]['num'])
-            }
+        var list = this.tList
+        var number = 0
+        for (var i in list) {
+          if (list[i]['siId'] == this.obj['siId']) {
+            this.max = parseInt(this.obj['actualNum']) - parseInt(list[i]['num'])
+            number++;
+            break;
           }
+        }
+        if (number == 0) {
+          this.max = this.obj['actualNum']
         }
       },
       //保存退货单

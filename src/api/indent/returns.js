@@ -7,7 +7,7 @@ export function returnsList(data, query) {
   const url = '/returnOrder/list/' + data.pageNum + '/' + data.pageSize+ '/'
   return request({
     headers: {
-      'authorization': getToken('rx'),
+      'authorization': getToken('clrx'),
     },
     url: url,
     method: 'get',
@@ -20,7 +20,7 @@ export function returnsListT(data, query) {
   const url = '/returnOrder/list/' + data.pageNum + '/' + data.pageSize
   return request({
     headers: {
-      'authorization': getToken('rx'),
+      'authorization': getToken('clrx'),
       'Content-Type': 'application/json'
     },
     url: url,
@@ -34,7 +34,7 @@ export function saveReturn(data) {
   const url = '/returnOrder/add'
   return request({
     headers: {
-      'authorization': getToken('rx'),
+      'authorization': getToken('clrx'),
       'Content-Type': 'application/json'
     },
     url: url,
@@ -47,7 +47,7 @@ export function alterReturn(data) {
   const url = '/returnOrder/update'
   return request({
     headers: {
-      'authorization': getToken('rx'),
+      'authorization': getToken('clrx'),
       'Content-Type': 'application/json'
     },
     url: url,
@@ -60,7 +60,7 @@ export function delReturnOrder(data) {
   const url = '/returnOrder/del/' + data
   return request({
     headers: {
-      'authorization': getToken('rx'),
+      'authorization': getToken('clrx'),
     },
     url: url,
     method: 'delete',
@@ -71,7 +71,7 @@ export function confirmReturnOrder(data) {
   const url = '/returnOrder/confirm/' + data
   return request({
     headers: {
-      'authorization': getToken('rx')
+      'authorization': getToken('clrx')
     },
     url: url,
     method: 'post'
@@ -82,7 +82,7 @@ export function getReturnOrder(data) {
   const url = '/returnOrder/getById/' + data
   return request({
     headers: {
-      'authorization': getToken('rx'),
+      'authorization': getToken('clrx'),
     },
     url: url,
     method: 'get',
@@ -93,7 +93,7 @@ export function uploadImgs(data) {
   const url = '/file/returnOrder/imgUpload'
   return request({
     headers: {
-      'authorization': getToken('rx'),
+      'authorization': getToken('clrx'),
       'Content-Type': 'multipart/form-data'
     },
     url: url,
@@ -106,7 +106,7 @@ export function getOrderGoodsById(data) {
   const url = '/returnOrder/getOrderGoodsById/' + data
   return request({
     headers: {
-      'authorization': getToken('rx'),
+      'authorization': getToken('clrx'),
     },
     url: url,
     method: 'get'
@@ -117,7 +117,7 @@ export function exportData(data) {
   const url = '/excel/export/returnOrderData'
   return request({
     headers: {
-      'authorization': getToken('rx'),
+      'authorization': getToken('clrx'),
       'Content-Type': 'application/json'
     },
     responseType: 'blob',

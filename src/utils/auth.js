@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie'
 
-const TokenKey = 'rx'
+const TokenKey = 'clrx'
 
 export function getToken(TokenKey) {
   return Cookies.get(TokenKey)
@@ -10,22 +10,22 @@ export function setToken(token) {
   return Cookies.set(TokenKey, token)
   // return Cookies.set(TokenKey, token)
 }
-export function getPer(per) {
-  return Cookies.get(per)
+export function getPer(clper) {
+  return Cookies.get(clper)
 }
 
-export function setPer(per) {
-  return Cookies.set('per', per)
+export function setPer(clper) {
+  return Cookies.set('clper', clper)
   // return Cookies.set(TokenKey, token)
 }
 
-export function removeToken() {
+export function removeToken(TokenKey) {
   return Cookies.remove(TokenKey)
 }
 
 export function setUserName(username){
-  return Cookies.set('un',username)
+  return Cookies.set('clun',username)
 }
 export function setPassword(password){
-  return Cookies.set('ps',password)
+  return Cookies.set('clps',password)
 }

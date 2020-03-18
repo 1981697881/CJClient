@@ -7,7 +7,7 @@ export function salesList(data, query) {
   const url = '/order/list/' + data.pageNum + '/' + data.pageSize + '/'
   return request({
     headers: {
-      'authorization': getToken('rx'),
+      'authorization': getToken('clrx'),
     },
     url: url,
     method: 'get',
@@ -19,7 +19,7 @@ export function salesListT(data, query) {
   const url = '/order/list/' + data.pageNum + '/' + data.pageSize
   return request({
     headers: {
-      'authorization': getToken('rx'),
+      'authorization': getToken('clrx'),
       'Content-Type': 'application/json'
     },
     url: url,
@@ -32,7 +32,7 @@ export function getOrderNum() {
   const url = '/order/getOrderNum';
   return request({
     headers: {
-      'authorization': getToken('rx'),
+      'authorization': getToken('clrx'),
     },
     url: url,
     method: 'get',
@@ -44,7 +44,7 @@ export function stockList(data, query) {
   const url = '/cjsh-stock-info/list/' + data.pageNum + '/' + data.pageSize
   return request({
     headers: {
-      'authorization': getToken('rx'),
+      'authorization': getToken('clrx'),
       'Content-Type': 'application/json'
     },
     url: url,
@@ -57,7 +57,7 @@ export function getWarehouse() {
   const url = '/warehouse/list';
   return request({
     headers: {
-      'authorization': getToken('rx'),
+      'authorization': getToken('clrx'),
     },
     url: url,
     method: 'get',
@@ -68,7 +68,7 @@ export function saveSale(data) {
   const url = '/order/add'
   return request({
     headers: {
-      'authorization': getToken('rx'),
+      'authorization': getToken('clrx'),
       'Content-Type': 'application/json'
     },
     url: url,
@@ -81,7 +81,7 @@ export function updateSale(data) {
   const url = '/order/update'
   return request({
     headers: {
-      'authorization': getToken('rx'),
+      'authorization': getToken('clrx'),
       'Content-Type': 'application/json'
     },
     url: url,
@@ -94,7 +94,7 @@ export function saleInfo(data) {
   const url = '/order/getOrderGoodsById/' + data
   return request({
     headers: {
-      'authorization': getToken('rx'),
+      'authorization': getToken('clrx'),
     },
     url: url,
     method: 'get',
@@ -105,7 +105,7 @@ export function getSaleOrder(data) {
   const url = '/order/getByOrderNum/' + data
   return request({
     headers: {
-      'authorization': getToken('rx'),
+      'authorization': getToken('clrx'),
     },
     url: url,
     method: 'get',
@@ -116,7 +116,7 @@ export function delSaleOrder(data) {
   const url = '/order/del/' + data
   return request({
     headers: {
-      'authorization': getToken('rx'),
+      'authorization': getToken('clrx'),
     },
     url: url,
     method: 'delete',
@@ -127,7 +127,7 @@ export function confirmSaleOrder(data) {
   const url = '/order/confirm/' + data
   return request({
     headers: {
-      'authorization': getToken('rx')
+      'authorization': getToken('clrx')
     },
     url: url,
     method: 'post',
@@ -138,7 +138,7 @@ export function exportorder(data) {
   const url = '/excel/export/order'
   return request({
     headers: {
-      'authorization': getToken('rx'),
+      'authorization': getToken('clrx'),
       'Content-Type': 'application/json'
     },
     responseType: 'blob',
@@ -152,7 +152,7 @@ export function getPlas(data) {
   const url = '/Admin/pla/list'
   return request({
     headers: {
-      'authorization': getToken('rx')
+      'authorization': getToken('clrx')
     },
     url: url,
     method: 'get'
@@ -163,7 +163,7 @@ export function exportData(data) {
   const url = '/excel/export/orderData'
   return request({
     headers: {
-      'authorization': getToken('rx'),
+      'authorization': getToken('clrx'),
       'Content-Type': 'application/json'
     },
     responseType: 'blob',

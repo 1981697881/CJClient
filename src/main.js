@@ -49,12 +49,12 @@ new Vue({
   render: h => h(App),
    created(){
      const data = {
-      username: Cookies.get('un'),
-      password: Cookies.get('ps')
+      username: Cookies.get('clun'),
+      password: Cookies.get('clps')
      }
     if(data.username && data.password){
-     var rs=Cookies.get('rx')
-      if(Cookies.get('rx') =="undefined"){
+     var rs=Cookies.get('clrx')
+      if(Cookies.get('clrx') =="undefined"){
         this.$router.push(`/login?redirect=${this.$route.fullPath}`)
         store.dispatch('user/resetToken')
       }else{

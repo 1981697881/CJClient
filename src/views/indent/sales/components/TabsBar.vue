@@ -97,7 +97,7 @@
     data() {
             return {
                 headers: {
-                    'authorization': getToken('rx'),
+                    'authorization': getToken('clrx'),
                 },
                 fileData:{
                     plaId:null
