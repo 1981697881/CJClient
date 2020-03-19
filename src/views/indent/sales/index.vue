@@ -86,7 +86,7 @@
           },
             // 查询
             query(val) {
-                this.$refs.list.fetchData(val)
+                this.$refs.list.uploadPr(val)
             },
           // 操作窗口
           operation(val) {

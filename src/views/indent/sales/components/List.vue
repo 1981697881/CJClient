@@ -160,14 +160,17 @@
               }
             });
           },
-            fetchData(val) {
+          uploadPr(val) {
+            this.fetchData(val, {
+              pageNum: 1,
+              pageSize: this.list.size || 50
+            })
+          },
+            fetchData(val, data = {
+              pageNum: this.list.current || 1,
+              pageSize: this.list.size || 50
+            }) {
                 this.loading = true
-                const data = {
-                    /*  fid: fid,
-                      type: type,*/
-                    pageNum: this.list.current || 1,
-                    pageSize: this.list.size || 50
-                }
                /* const query = {
                     query: typeof (val) == "undefined" ? '' : val.query,
                     endDate: typeof (val) == "undefined" ? '' : val.endDate,
