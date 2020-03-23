@@ -102,6 +102,7 @@
                 fileData:{
                     plaId:null
                 },
+              flag: true,
                 plas: null,
                 plaArray:[],
               plaIdS: null,
@@ -142,9 +143,34 @@
             };
         },
     mounted() {
-      this.fetchFormat();
+      this.fetchFormat()
+    },
+    created() {
+      document.addEventListener('keydown', this.handleKeyDown)
+      document.addEventListener('keyup', this.handleKeyUp)
+    },destroyed() {
+      document.removeEventListener('keydown', this.handleKeyDown)
+      document.removeEventListener('keyup', this.handleKeyUp)
     },
         methods: {
+          handleKeyDown(e) {
+            var key = window.event.keyCode ? window.event.keyCode : window.event.which
+            if( key === 13 ) {
+              if(this.flag) {
+                this.$emit('queryOrder', this.qFilter())
+                this.flag = false
+              }
+              e.preventDefault() //取消浏览器原有的ctrl+s操作
+            }
+          },
+          handleKeyUp(e) {
+            // enter
+            var key = window.event.keyCode ? window.event.keyCode : window.event.which
+            if( key === 13 ){
+              this.flag = true
+              e.preventDefault()
+            }
+          },
           getPlaId() {
             return {plaId: this.plaIdS}
           },
