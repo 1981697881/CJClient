@@ -11,7 +11,7 @@ import {
 import querystring from 'querystring'
 // create an axios instance
 const service = axios.create({
-  baseURL: (process.env.NODE_ENV === 'production'?'http://120.78.168.141:8090':'')+process.env.VUE_APP_BASE_API, // url = base url + request url
+  baseURL: (process.env.NODE_ENV === 'production'?'http://test.gzfzdev.com:8080':'')+process.env.VUE_APP_BASE_API, // url = base url + request url
   withCredentials: true, // send cookies when cross-domain requests
   timeout: 20000 // request timeout
 })
@@ -68,11 +68,23 @@ service.interceptors.response.use(
         duration: 5 * 1000
       })
 
-      /* if(res.status === 10){//需要重新登录
+      if(res.status === 20010){//需要重新登录
         store.dispatch('user/resetToken').then(() => {
-          location.reload()
+          //location.reload()
+          MessageBox('登录出错, 是否重试?', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).then(() => {
+            location.reload()
+          }).catch(() => {
+            Message({
+              type: 'info',
+              message: '已取消'
+            });
+          });
         })
-      } */
+      }
 
       // 50008: Illegal token; 50012: Other clients logged in; 50014: Token expired;
       if (res.code === 50008 || res.code === 50012 || res.code === 50014) {

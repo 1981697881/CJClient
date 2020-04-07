@@ -62,6 +62,7 @@
     data() {
       return {
         plaIdS: null,
+        flag: true,
         plaArray: [],
         search: {
           keyword: null

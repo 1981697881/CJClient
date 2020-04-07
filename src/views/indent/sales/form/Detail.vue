@@ -549,11 +549,11 @@
           //判断图片是否为空
           this.tpvisible = true;
           if (this.fileList.length > 0) {
-            this.fileList[0].url = 'http://120.78.168.141:8090/web' + imgArray[0];
+            this.fileList[0].url = 'http://test.gzfzdev.com:8080/web' + imgArray[0];
           } else {
             this.fileList = []
             this.fileList.push({
-              url: 'http://120.78.168.141:8090/web' + imgArray[0]
+              url: 'http://test.gzfzdev.com:8080/web' + imgArray[0]
             })
           }
         } else {

@@ -143,6 +143,7 @@ const actions = {
   resetToken({ commit }) {
     return new Promise(resolve => {
       commit('SET_TOKEN', '')
+      removeToken('clrx')
       removeToken()
       resolve()
     })

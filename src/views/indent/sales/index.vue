@@ -5,7 +5,7 @@
       <div>
         <tabs-bar ref="tabs" @queryOrder="query" @uploadList="upload" @confirm="confirm" @showDialog="handlerDialog"  @showReturn="returnRequest" @delOrder="delRequest"/>
       </div>
-      <list ref="list" @showDialog="handlerDialog"/>
+      <list ref="list" @showDialog="handlerDialog" @uploadList="upload"/>
     </div>
     <el-dialog
       :fullscreen="isfullscreen"
@@ -104,7 +104,7 @@
             }
           },
             // 更新列表
-            upload(val) {
+            upload(val = this.$refs.tabs.getPlaId()) {
                 this.$refs.list.fetchData(val)
             },
           onUpload() {

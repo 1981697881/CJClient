@@ -82,7 +82,7 @@
         }
       },
       //更新列表
-      upload(val) {
+      upload(val = this.$refs.tabs.getPlaId()) {
         this.$refs.list.fetchData(val)
       },
       onUpload() {

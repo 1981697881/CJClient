@@ -36,8 +36,8 @@ export default {
       list: {},
       type: null,
       columns: [
-        { text: "orderId", name: "orderId", default:false},
-        { text: "reOdId", name: "reOdId", default:false},
+        { text: "orderId", name: "orderId", default: false},
+        { text: "reOdId", name: "reOdId", default: false},
         { text: "退货申请日期", name: "createTime", width: '150' },
         { text: "原订单单号", name: "sourceOrderNum", width: '150' },
         { text: "退货单号", name: "orderNum", width: '150' },
@@ -48,8 +48,8 @@ export default {
         { text: "单位", name: "unitOfMea", width: '70' },
         { text: "原单数量", name: "sourceNum", width: '70' },
         { text: "退货数量", name: "num", width: '70' },
-        { text: "单价", name: "sellPrice", default:false, width: '70'},
-        { text: "金额", name: "totalPrice", default:false, width: '70'},
+        { text: "单价", name: "sellPrice", default: false, width: '70'},
+        { text: "金额", name: "totalPrice", default: false, width: '70'},
         { text: "发货仓库", name: "plaName", width: '80' },
         { text: "退货原因", name: "reason", width: '150' },
        /* { text: "商品图片", name: "" , width: '150'},*/
@@ -83,12 +83,12 @@ export default {
     // 监听每页显示几条
     handleSize(val) {
       this.list.size = val
-      this.fetchData();
+      this.$emit('uploadList')
     },
     // 监听当前页
     handleCurrent(val) {
       this.list.current = val;
-      this.fetchData();
+      this.$emit('uploadList')
     },
     // 监听单击某一行
     rowClick(obj) {
