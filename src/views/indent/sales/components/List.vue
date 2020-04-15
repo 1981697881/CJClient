@@ -69,6 +69,7 @@
                   {text: "金额", name: "totalPrice", default: false, width: '80' },
                   {text: "发货仓库", name: "plaName", width: '80'},
                   {text: "备注", name: "remark", width: '120'},
+                  { text: "审核人", name: "auditor", width: '80' },
                   {text: "审核状态", name: "auditStatus", width: '80'},
                   {text: "状态", name: "status", width: '80'},
                   {text: "审核反馈", name: "reasonOfDis", width: '100'},
@@ -188,6 +189,7 @@
                             record[i].orderDetails[a].plas = record[i].plaId
                             record[i].orderDetails[a].plaName = record[i].plaName
                             record[i].orderDetails[a].customer = record[i].customer
+                            record[i].orderDetails[a].auditor = record[i].auditor
                             record[i].orderDetails[a].customerCode = record[i].customerCode
                             record[i].orderDetails[a].auditStatus = record[i].auditStatus
                             record[i].orderDetails[a].status = record[i].status

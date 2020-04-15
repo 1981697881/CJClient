@@ -280,7 +280,7 @@
             this.images.push(imgArray[i].split('/web/returnOrder/img/')[1])
             //展示已有图片到窗口
             this.fileList.push({
-              url: 'http://test.gzfzdev.com:8080/web' + imgArray[i],
+              url: 'http://120.78.168.141:8090/web' + imgArray[i],
               name: imgArray[i].split('/web/returnOrder/img/')[1]
             })
           }
