@@ -6,6 +6,7 @@
       :loading="loading"
       :list="list"
       index
+       show-summary
       @handle-size="handleSize"
       @handle-current="handleCurrent"
       @dblclick="dblclick"
@@ -48,6 +49,7 @@ export default {
         { text: "单位", name: "unitOfMea", width: '70' },
         { text: "原单数量", name: "sourceNum", width: '70' },
         { text: "退货数量", name: "num", width: '70' },
+        { text: "实际退货数量", name: "actualNum", width: '70' },
         { text: "单价", name: "sellPrice", default: false, width: '70'},
         { text: "金额", name: "totalPrice", default: false, width: '70'},
         { text: "发货仓库", name: "plaName", width: '80' },

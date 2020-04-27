@@ -28,6 +28,7 @@
       :loading="loading"
       :list="list"
       index
+      show-summary
       @handle-size="handleSize"
       @handle-current="handleCurrent"
       @dblclick="dblclick"
@@ -65,6 +66,7 @@
                   {text: "单位", name: "unitOfMea", width: '70'},
                   {text: "订单数量", name: "num", width: '70'},
                   {text: "实发数量", name: "actualNum", width: '70'},
+                  {text: "退货数量", name: "retNum", width: '70'},
                   {text: "单价", name: "sellPrice", default: false, width: '80' },
                   {text: "金额", name: "totalPrice", default: false, width: '80' },
                   {text: "发货仓库", name: "plaName", width: '80'},
@@ -192,7 +194,6 @@
                             record[i].orderDetails[a].auditor = record[i].auditor
                             record[i].orderDetails[a].customerCode = record[i].customerCode
                             record[i].orderDetails[a].auditStatus = record[i].auditStatus
-                            record[i].orderDetails[a].status = record[i].status
                             record[i].orderDetails[a].reasonOfDis = record[i].reasonOfDis
                             record[i].orderDetails[a].remark = record[i].remark
                             obj.push(record[i].orderDetails[a])
