@@ -6,13 +6,15 @@
           <el-form-item :label="'日期'">
             <el-date-picker
               v-model="value"
-              type="datetimerange"
-              :picker-options="pickerOptions"
+              type="daterange"
+              align="right"
+              class="input-class"
+              unlink-panels
               range-separator="至"
-              value-format="yyyy-MM-dd HH:mm:ss"
+              value-format="yyyy-MM-dd"
               start-placeholder="开始日期"
               end-placeholder="结束日期"
-              align="right">
+              :picker-options="pickerOptions">
             </el-date-picker>
           </el-form-item>
         </el-col>
@@ -24,7 +26,7 @@
         <el-col :span="2">
           <el-button :size="'mini'" type="success" icon="el-icon-search" @click="query">查询</el-button>
         </el-col>
-        <el-col :span="3">
+        <el-col :span="4">
           <el-form-item :label="'平台'" prop="plaIdS">
             <el-select v-model="plaIdS"  placeholder="请选择" @change="selectChange">
               <el-option
@@ -76,7 +78,7 @@
       destroy-on-close
     >
       <div style="text-align: center" >
-        <el-radio v-model="plas"  border size="medium" v-for="t in plaArray" :label="t.plaId">{{t.platformName}}</el-radio>
+        <el-radio v-model="plas"  border size="medium" v-for="(t,i) in plaArray" :label="t.plaId" :key="i">{{t.platformName}}</el-radio>
       </div>
       <div slot="footer" style="text-align:center;padding-top:15px;">
         <el-button type="success" @click="handleAdd">确定</el-button>
