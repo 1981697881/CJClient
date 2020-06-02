@@ -100,7 +100,7 @@
               this.$emit('uploadList')
             },
             dblclick(obj) {
-              if(obj.row.auditStatus == '已审核' || obj.row.auditStatus == '已驳回'){
+              if(obj.row.auditStatus == '已审核'){
                 const data = {
                   oid: obj.row.oid,
                   plas: obj.row.plas,

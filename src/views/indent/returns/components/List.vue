@@ -98,7 +98,7 @@ export default {
       this.$store.dispatch("list/setClickData", obj.row);
     },
     dblclick(obj) {
-      if (obj.row.isAudit == '已审核' || obj.row.isAudit == '已驳回') {
+      if (obj.row.isAudit == '已审核') {
         obj.row.isAdd = false
         this.$emit('showDialog',obj.row)
       }else{

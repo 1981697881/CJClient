@@ -129,7 +129,7 @@
         <el-row :gutter="20" type="flex" justify="center">
           <el-col :span="12">
             <el-form-item :label="'退货数量'">
-              <el-input-number v-model="num1" @change="handleChange" :min="0.1" :precision="2" :step="0.1" :max='max' label="描述文字"></el-input-number>
+              <el-input-number v-model="num1" @change="handleChange" :min="0.1" :precision="2" :step="1" :max='max' label="描述文字"></el-input-number>
             </el-form-item>
           </el-col>
         </el-row>
@@ -277,7 +277,7 @@
           //从table获取img展示到窗口
           for (let i in imgArray) {
             //添加已有图片到数组
-            this.images.push(imgArray[i].split('/web/returnOrder/img/')[1])
+            this.images.push(imgArray[i].split('/returnOrder/img/')[1])
             //展示已有图片到窗口
             this.fileList.push({
               url: 'http://120.78.168.141:8090/web' + imgArray[i],
@@ -404,6 +404,7 @@
           message: res.msg,
           type: "success"
         });
+        console.log(this.images)
         this.$emit('uploadList')
       },
       //删除图片

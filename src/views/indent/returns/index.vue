@@ -22,7 +22,6 @@
 <script>
   import {TabsBar, List} from "./components";
   import {Returns} from "./form";
-
   export default {
     components: {
       TabsBar,

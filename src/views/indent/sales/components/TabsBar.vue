@@ -330,7 +330,7 @@
           },
             handleAlter() {
                 if (this.clickData.oid) {
-                  if (this.clickData.auditStatus == '已审核' || this.clickData.auditStatus == '已驳回') {
+                  if (this.clickData.auditStatus == '已审核') {
                     this.$emit('showDialog', {
                       oid: this.clickData.oid,
                       plas: this.clickData.plas,
