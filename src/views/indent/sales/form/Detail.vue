@@ -63,7 +63,7 @@
       </el-row>
       <el-row :gutter="20">
         <el-col :span="12">
-          <el-table class="list-main" :height="'250px'" :data="list"  border size="mini"  :highlight-current-row="true" @selection-change="handleSelectionChange">
+          <el-table class="list-main" :height="'250px'" :data="list.records"  border size="mini"  :highlight-current-row="true" @selection-change="handleSelectionChange">
             <el-table-column
               type="selection"
               width="55">
@@ -369,11 +369,15 @@
       },
       inat(value) {
         if(value.data == null) {
-          this.query()
+          setTimeout(() =>{
+            this.query()
+          },500);
         }else{
           if(value.data.replace(/\s+/g, "") != "") {
             this.search = value.data
-            this.query()
+            setTimeout(() =>{
+              this.query()
+            },500);
           }
         }
       },
@@ -381,6 +385,7 @@
         this.wFormat(val);
       },
       query() {
+        this.list.current = 1;
         this.fetchData();
       },
       deleteRow(index, rows) {
@@ -400,6 +405,8 @@
             jbj.gid = list[i].gid
             jbj.siId = list[i].siId
             jbj.goodCode = list[i].goodCode
+            jbj.standard = list[i].standard
+            jbj.unitOfMea = list[i].unitOfMea
             jbj.goodName = list[i].goodName
             jbj.num = list[i].num
             array.push(jbj)
@@ -452,13 +459,13 @@
       },
       //监听每页显示几条
       handleSize(val) {
-        this.list.pageSize = val
-        this.fetchData(this.node.data.fid, this.node.data.type);
+        this.list.size = val
+        this.fetchData();
       },
       //监听当前页
       handleCurrent(val) {
-        this.list.pageNum = val;
-        this.fetchData(this.node.data.fid, this.node.data.type);
+        this.list.current = val;
+        this.fetchData();
       },
       //添加数量->待确认区
       saveNum() {
@@ -578,17 +585,21 @@
         this.loading = true;
         const data = {
           //wid: this.form.wid || '',
-
           pageNum: this.list.current || 1,
           pageSize: this.list.size || 50
         };
         const obj = { plaId: this.plaId }
         this.search != '' ? obj.goodName = this.search : null
-        console.log(obj)
         stockList(data, obj).then(res => {
           if (res.flag) {
             this.loading = false
-            this.list = res.data.records
+            this.list= {
+              current: res.data.current,
+              pages: res.data.pages,
+              size: res.data.size,
+              total: res.data.total,
+              records: res.data.records
+            }
           }
         })
       },
