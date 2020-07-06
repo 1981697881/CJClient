@@ -85,7 +85,7 @@
             <el-table-column
               fixed="right"
               label="操作"
-              width="120">
+              width="100">
               <template slot-scope="scope">
                 <el-button type="text" size="small" @click.native="handleAdd(scope.row)">添加</el-button>
               </template>

@@ -485,6 +485,7 @@
           //false
           if (number == 0) {
             //查询窗口插入数据
+
             this.tList.push(obj)
           }
         } else {
@@ -569,7 +570,6 @@
             type: "warning"
           });
         }
-
       },
       handleSelectionChange(val) {
         this.multipleSelection = val

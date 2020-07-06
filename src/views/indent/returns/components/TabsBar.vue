@@ -135,9 +135,9 @@
       fetchFormat() {
         getPlas().then(res => {
           if (res.flag) {
-            this.$emit('uploadList', {plaId: res.data[0].plaId})
             this.plaArray = res.data;
             this.plaIdS = res.data[0].plaId;
+            this.$emit('uploadList', {plaId: res.data[0].plaId})
           }
         });
       },
@@ -177,9 +177,9 @@
         }
       },
       upload() {
-        this.$emit('uploadList', {plaId: this.plaIdS})
         this.search.keyword = ''
         this.value4 = ''
+        this.$emit('uploadList', {plaId: this.plaIdS})
       },
       query() {
         this.$emit('queryOrder', this.qFilter())
@@ -208,7 +208,6 @@
       },
       exportOrder() {
         exportData(this.qFilter()).then(res => {
-          console.log(res)
           this.download(res)
         })
       },

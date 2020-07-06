@@ -70,7 +70,7 @@
       },
       //查询
       query(val) {
-        this.$refs.list.uploadPr(val)
+        this.$refs.list.uploadPr(this.$refs.tabs.qFilter())
       },
       //操作窗口
       operation(val) {
@@ -82,10 +82,10 @@
       },
       //更新列表
       upload(val = this.$refs.tabs.getPlaId()) {
-        this.$refs.list.fetchData(val)
+        this.$refs.list.uploadPr(this.$refs.tabs.qFilter())
       },
       onUpload() {
-        this.$refs.list.fetchData(this.$refs.tabs.getPlaId())
+        this.$refs.list.uploadPr(this.$refs.tabs.qFilter())
       },
     }
   }
