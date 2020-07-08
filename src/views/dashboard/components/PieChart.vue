@@ -6,6 +6,7 @@
 import echarts from 'echarts'
 require('echarts/theme/macarons') // echarts theme
 import resize from './mixins/resize'
+import store from "../../../store";
 
 export default {
   mixins: [resize],
@@ -20,18 +21,23 @@ export default {
     },
     height: {
       type: String,
-      default: '300px'
+      default: '500px'
     }
   },
   data() {
     return {
-      chart: null
+      chart: null,
+      dateEnd: null,
+      dateStart: null,
+      headData: [],
+      bodyData: [],
+      type: 1
     }
   },
   mounted() {
-    this.$nextTick(() => {
+   /* this.$nextTick(() => {
       this.initChart()
-    })
+    })*/
   },
   beforeDestroy() {
     if (!this.chart) {
@@ -41,37 +47,87 @@ export default {
     this.chart = null
   },
   methods: {
-    initChart() {
+    reset(infoData) {
+      let info = []
+      if (this.type === 1) {
+        infoData.forEach(function(item, index) {
+          info.push({
+            name: item.name,
+            value: item.totalPrice
+          })
+        })
+        this.$emit('uploadList',false)
+        this.type = 2
+      } else {
+        infoData.forEach(function(item, index) {
+          info.push({
+            name: item.name,
+            value: item.totalNum
+          })
+        })
+        this.$emit('uploadList',true)
+        this.type = 1
+      }
+      this.chart.setOption({
+        series: {
+          data: info
+        }
+      })
+    },
+    initChart(infoData) {
+      let me = this
+      let array = []
+      let info = []
+        infoData.forEach(function(item, index) {
+          array.push(item.name)
+          info.push({
+            name: item.name,
+            value: item.totalNum
+          })
+        })
       this.chart = echarts.init(this.$el, 'macarons')
-
       this.chart.setOption({
         tooltip: {
           trigger: 'item',
           formatter: '{a} <br/>{b} : {c} ({d}%)'
         },
-        legend: {
-          left: 'center',
-          bottom: '10',
-          data: ['Industries', 'Technology', 'Forex', 'Gold', 'Forecasts']
-        },
-        series: [
-          {
-            name: 'WEEKLY WRITE ARTICLES',
-            type: 'pie',
-            roseType: 'radius',
-            radius: [15, 95],
-            center: ['50%', '38%'],
-            data: [
-              { value: 320, name: 'Industries' },
-              { value: 240, name: 'Technology' },
-              { value: 149, name: 'Forex' },
-              { value: 100, name: 'Gold' },
-              { value: 59, name: 'Forecasts' }
-            ],
-            animationEasing: 'cubicInOut',
-            animationDuration: 2600
+        toolbox: {
+          feature: {
+            myTool: {
+              show: true,
+              title: '切换销量/销售额',
+              icon: 'image://' + require('@/assets/logo/edzh.png'),
+              onclick: function() {
+                me.reset(infoData)
+              }
+            },
+            dataView: {show: true, readOnly: false},
+            restore: {show: true},
+            saveAsImage: {show: true},
           }
-        ]
+        },
+        legend: {
+          orient: 'vertical',
+          type: 'scroll',
+          left: '10',
+          data: array
+        },
+          series: [
+              {
+                  name: '分类',
+                  type: 'pie',
+                  radius: '55%',
+                  center: ['50%', '50%'],
+                  data: info,
+                  emphasis: {
+                      itemStyle: {
+                          shadowBlur: 10,
+                          shadowOffsetX: 0,
+                          shadowColor: 'rgba(0, 0, 0, 0.5)'
+                      }
+                  }
+              }
+          ]
       })
     }
   }

@@ -50,7 +50,8 @@ new Vue({
    created(){
      const data = {
       username: Cookies.get('clun'),
-      password: Cookies.get('clps')
+      password: Cookies.get('clps'),
+       backstage: false
      }
     if(data.username && data.password){
      var rs=Cookies.get('clrx')

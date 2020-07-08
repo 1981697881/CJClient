@@ -22,18 +22,19 @@ export default {
     },
     height: {
       type: String,
-      default: '300px'
+      default: '500px'
     }
   },
   data() {
     return {
-      chart: null
+      chart: null,
+      type: 1
     }
   },
   mounted() {
-    this.$nextTick(() => {
+   /* this.$nextTick(() => {
       this.initChart()
-    })
+    })*/
   },
   beforeDestroy() {
     if (!this.chart) {
@@ -43,58 +44,87 @@ export default {
     this.chart = null
   },
   methods: {
-    initChart() {
+    reset() {
+      if (this.type === 1) {
+        this.type = 2
+        this.$emit('uploadList',false)
+      } else {
+        this.type = 1
+        this.$emit('uploadList',true)
+      }
+    },
+    initChart(infoData) {
+      let array1 = []
+      let me = this
+      let array2 = []
+      let info = []
+      infoData.forEach(function(item, index) {
+        array1.push(item.totalNum)
+        array2.push(item.totalPrice)
+        info.push(item.goodName)
+      })
       this.chart = echarts.init(this.$el, 'macarons')
-
       this.chart.setOption({
-        tooltip: {
-          trigger: 'axis',
-          axisPointer: { // 坐标轴指示器，坐标轴触发有效
-            type: 'shadow' // 默认为直线，可选为：'line' | 'shadow'
+         /* title: {
+              text: '世界人口总量',
+              subtext: '数据来自网络'
+          },*/
+          tooltip: {
+              trigger: 'axis',
+              axisPointer: {
+                  type: 'shadow'
+              }
+          },
+        toolbox: {
+          feature: {
+            myTool: {
+              show: true,
+              title: '切换销量/销售额',
+              icon: 'image://' + require('@/assets/logo/edzh.png'),
+              onclick: function() {
+                me.reset()
+              }
+            },
+            dataView: {show: true, readOnly: false},
+            restore: {show: true},
+            saveAsImage: {show: true},
           }
         },
-        grid: {
-          top: 10,
-          left: '2%',
-          right: '2%',
-          bottom: '3%',
-          containLabel: true
-        },
-        xAxis: [{
-          type: 'category',
-          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-          axisTick: {
-            alignWithLabel: true
-          }
-        }],
-        yAxis: [{
-          type: 'value',
-          axisTick: {
-            show: false
-          }
-        }],
-        series: [{
-          name: 'pageA',
-          type: 'bar',
-          stack: 'vistors',
-          barWidth: '60%',
-          data: [79, 52, 200, 334, 390, 330, 220],
-          animationDuration
-        }, {
-          name: 'pageB',
-          type: 'bar',
-          stack: 'vistors',
-          barWidth: '60%',
-          data: [80, 52, 200, 334, 390, 330, 220],
-          animationDuration
-        }, {
-          name: 'pageC',
-          type: 'bar',
-          stack: 'vistors',
-          barWidth: '60%',
-          data: [30, 52, 200, 334, 390, 330, 220],
-          animationDuration
-        }]
+          legend: {
+              data: ['销量', '金额']
+          },
+          grid: {
+              left: '3%',
+              right: '4%',
+              bottom: '3%',
+              containLabel: true
+          },
+          xAxis: {
+              type: 'value',
+              boundaryGap: [0, 0.01]
+          },
+          yAxis: {
+              type: 'category',
+              data: info,
+          },
+          series: [
+              {
+                  name: '销量',
+                label: {
+                  show: true
+                },
+                  type: 'bar',
+                  data: array1
+              },
+              {
+                  name: '金额',
+                  type: 'bar',
+                label: {
+                  show: true
+                },
+                  data: array2
+              }
+          ]
       })
     }
   }
