@@ -11,7 +11,7 @@ import {
 import querystring from 'querystring'
 // create an axios instance
 const service = axios.create({
-  baseURL: (process.env.NODE_ENV === 'production'?'http://192.168.31.170:8080':'')+process.env.VUE_APP_BASE_API, // url = base url + request url
+  baseURL: (process.env.NODE_ENV === 'production'?'http://120.78.168.141:8090':'')+process.env.VUE_APP_BASE_API, // url = base url + request url
   withCredentials: true, // send cookies when cross-domain requests
   timeout: 20000 // request timeout
 })

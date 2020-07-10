@@ -79,7 +79,7 @@ export default {
           feature: {
             myTool: {
               show: true,
-              title: '切换销量/销售额',
+              title: '切换采购量/采购额',
               icon: 'image://' + require('@/assets/logo/edzh.png'),
               onclick: function() {
                 me.reset()
@@ -91,7 +91,7 @@ export default {
           }
         },
           legend: {
-              data: ['销量', '金额']
+              data: ['采购量', '金额']
           },
           grid: {
               left: '3%',
@@ -109,7 +109,7 @@ export default {
           },
           series: [
               {
-                  name: '销量',
+                  name: '采购量',
                 label: {
                   show: true
                 },

@@ -95,7 +95,7 @@ export default {
           feature: {
             myTool: {
               show: true,
-              title: '切换销量/销售额',
+              title: '切换采购量/采购量额',
               icon: 'image://' + require('@/assets/logo/edzh.png'),
               onclick: function() {
                 me.reset(infoData)
