@@ -58,6 +58,7 @@
                 columns: [
                     {text: "oid", name: "oid", default: false},
                   {text: "日期", name: "createTime", width: '150'},
+                  {text: "审核日期", name: "auditTime", width: '150'},
                     {text: "订单单号", name: "orderNum", width: '150'},
                   {text: "购货单位", name: "customer", width: '110'},
                   {text: "物料代码", name: "goodCode", width: '110'},
@@ -192,6 +193,7 @@
                             record[i].orderDetails[a].plaName = record[i].plaName
                             record[i].orderDetails[a].customer = record[i].customer
                             record[i].orderDetails[a].auditor = record[i].auditor
+                            record[i].orderDetails[a].auditTime = record[i].auditTime
                             record[i].orderDetails[a].customerCode = record[i].customerCode
                             record[i].orderDetails[a].auditStatus = record[i].auditStatus
                             record[i].orderDetails[a].reasonOfDis = record[i].reasonOfDis
